@@ -1,0 +1,598 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>campaign &mdash; ovsm 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ovsm
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">ovsm</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ovsm</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>campaign</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for campaign</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">parallel_backend</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../campaign.html#campaign.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">iter_path</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span>
+        <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the results relative to the desired parameter space in the form of an xarray data structure.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    output_dir: (path) The space of structure_file to export.</span>
+<span class="sd">    max_processors: (int) The max number of cpus to use. By default, all cpus are used.</span>
+<span class="sd">    omnet_path: (path) Path to the OMNET++ installation.</span>
+<span class="sd">    By default the script try to find the installation path.</span>
+<span class="sd">    sim_time: (int) The simulation time. Common for all scenarios.</span>
+<span class="sd">    repetitions: (int) The number of runs for each iteration parameter.</span>
+<span class="sd">    analyze: (bool) If true execute simulation campaign. Otherwise analyze result files</span>
+<span class="sd">    from a simulation campaign to find missing simulations.</span>
+<span class="sd">    inifile: (path) Path to .ini file of veins project.</span>
+<span class="sd">    makefile: (path) Path to executable veins project.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Try to read scenarios from .ini file in veins_ini_file_path</span>
+    <span class="n">sim_scenarios_list</span> <span class="o">=</span> <span class="n">get_scenarios</span><span class="p">(</span><span class="n">inifile</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Configuration file (</span><span class="si">{0}</span><span class="s2">):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inifile</span><span class="p">))</span>
+
+    <span class="c1"># List scenarios found in .ini file</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">scenario</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sim_scenarios_list</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">{0}</span><span class="s1">) </span><span class="si">{1}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">scenario</span><span class="p">))</span>
+
+    <span class="c1"># Ask for scenarios to simulate or analyze</span>
+    <span class="n">scenarios_to_sim</span> <span class="o">=</span> <span class="n">ask_for_scenarios_to_simulate</span><span class="p">(</span><span class="n">sim_scenarios_list</span><span class="p">)</span>
+
+    <span class="c1"># Build the simulation campaign</span>
+    <span class="n">build_simulation_campaign</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">scenarios_to_sim</span><span class="p">,</span>
+                              <span class="n">iter_path</span><span class="p">,</span>
+                              <span class="n">inifile</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># clear memory, swap after simulations</span>
+    <span class="n">clear_memory</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_scenarios"><a class="viewcode-back" href="../campaign.html#campaign.get_scenarios">[docs]</a><span class="k">def</span> <span class="nf">get_scenarios</span><span class="p">(</span><span class="n">veins_ini_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Try to read simulation scenarios in VEINs project .ini file</span>
+
+<span class="sd">     OMNET++ defines [Config ] as the structure in ini file to declare an scenario.</span>
+<span class="sd">     This function return a list with [Config ] declarations found in ini file.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scenarios</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">veins_ini_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ini_file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ini_file</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">isNotBlank</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s1">&#39;[Config&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">s_name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">[Config&#39;</span><span class="p">)</span>
+                    <span class="n">s_name</span> <span class="o">=</span> <span class="n">s_name</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">isNotBlank</span><span class="p">(</span><span class="n">s_name</span><span class="p">):</span>
+                        <span class="n">scenarios</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s_name</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">scenarios</span></div>
+
+
+<div class="viewcode-block" id="read_iteration_variables_from_file"><a class="viewcode-back" href="../campaign.html#campaign.read_iteration_variables_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_iteration_variables_from_file</span><span class="p">(</span><span class="n">scenarios_to_sim</span><span class="p">,</span> <span class="n">iter_parameters_file_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the number of iteration structure_file (defined as specified in OMNET++ Simulation manual 10.4 Parameter Studies)</span>
+<span class="sd">    of each scenario (sim_scenarios) defined in .ini file.</span>
+
+<span class="sd">    e.g. OMNET++ study parameter definition -&gt; *.numHosts = ${1, 2, 5, 10..50 step 10}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    sim_scenarios (list): List of selected scenarios to include in the campaign</span>
+<span class="sd">    veins_ini_file_path (path): Path to .ini file of veins project.</span>
+
+<span class="sd">    Return a dictionary with scenarios as dic keys and read_iteration_variables_from_file as values.</span>
+<span class="sd">    Values in read_iteration_variables_from_file dictionary are defined as follows:</span>
+
+<span class="sd">    scenario1: [parameters1, parameter2, ... , # of read_iteration_variables_from_file]</span>
+<span class="sd">    scenario2: [parameters1, parameter2, ... , # of read_iteration_variables_from_file]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dic_iter_vars</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">dic_scenario_iter_vars</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scenarios_to_sim</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">iter_parameters_file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ini_file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ini_file</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">isNotBlank</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                    <span class="n">ivar</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">ivar</span><span class="p">)</span>
+                    <span class="n">temp</span><span class="p">,</span> <span class="n">units</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">)</span>
+                    <span class="n">vlist</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="n">iter_var_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">vlist</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                    <span class="n">dic_iter_vars</span><span class="p">[</span><span class="n">ivar</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="n">iter_var_tuple</span>
+        <span class="n">dic_scenario_iter_vars</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic_iter_vars</span>
+    <span class="k">return</span> <span class="n">dic_iter_vars</span><span class="p">,</span> <span class="n">dic_scenario_iter_vars</span></div>
+
+
+<div class="viewcode-block" id="scenario_runs_set"><a class="viewcode-back" href="../campaign.html#campaign.scenario_runs_set">[docs]</a><span class="k">def</span> <span class="nf">scenario_runs_set</span><span class="p">(</span><span class="n">scenario_iteration_variables_dictionary</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Generate runs list per scenario in OMNET++ format (opp_run all OMNET++ simulation manual  11.20 Running Simulation Campaigns)</span>
+<span class="sd">     for create batches e.g. -r 0,1,2,3.</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">        scenario_iteration_variables_dictionary (dict): Dictionary with scenarios as keys and the number of iteration variables as values</span>
+<span class="sd">        repetitions (int): The number of runs for each iteration parameter.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">runs_dic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">simulations_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">scenario</span> <span class="ow">in</span> <span class="n">scenario_iteration_variables_dictionary</span><span class="p">:</span>
+        <span class="n">values_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">scenario_iteration_variables_dictionary</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">scenario_iteration_variables_dictionary</span><span class="p">[</span><span class="n">scenario</span><span class="p">]]</span>
+        <span class="n">scenario_runs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">values_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">repetitions</span>
+        <span class="n">simulations_count</span> <span class="o">+=</span> <span class="n">scenario_runs</span>
+        <span class="n">runs_range</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">scenario_runs</span><span class="p">)))</span>
+        <span class="n">runs_dic</span><span class="p">[</span><span class="n">scenario</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">runs_range</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;[]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">total_simulations</span> <span class="o">=</span> <span class="n">scenario_runs</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">scenario_iteration_variables_dictionary</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">total_simulations</span><span class="p">,</span> <span class="n">runs_dic</span></div>
+
+
+<div class="viewcode-block" id="sim_campaign_info"><a class="viewcode-back" href="../campaign.html#campaign.sim_campaign_info">[docs]</a><span class="k">def</span> <span class="nf">sim_campaign_info</span><span class="p">(</span><span class="n">scenarios_to_sim</span><span class="p">,</span> <span class="n">iteration_variables_dictionary</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">simtime</span><span class="p">,</span> <span class="n">total_sims</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Print simulation campaign summary:</span>
+
+<span class="sd">     Args:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">banner</span> <span class="o">=</span> <span class="s1">&#39; Simulation campaign summary&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">banner</span><span class="p">),</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">banner</span><span class="p">),</span> <span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">banner</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Scenarios to simulate [scenario]: </span><span class="si">{0}</span><span class="s2">&quot;</span>
+          <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Iteration variables: </span><span class="si">{1}</span><span class="s2"> = </span><span class="si">{2}</span><span class="s2">&quot;</span>
+          <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Repetitions per scenario: </span><span class="si">{3}</span><span class="s2">&quot;</span>
+          <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Simulation time: </span><span class="si">{4}</span><span class="s2">s&quot;</span>
+          <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Total Runs: </span><span class="si">{5}</span><span class="s2"> </span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scenarios_to_sim</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">iteration_variables_dictionary</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span> <span class="nb">list</span><span class="p">(</span><span class="n">iteration_variables_dictionary</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">repetitions</span><span class="p">,</span>
+                                           <span class="n">simtime</span><span class="p">,</span> <span class="n">total_sims</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="buid_campaign"><a class="viewcode-back" href="../campaign.html#campaign.buid_campaign">[docs]</a><span class="k">def</span> <span class="nf">buid_campaign</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">s_build_campaign</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39; Build simulation campaign (*Y/N): &#39;</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Wrong input!&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">s_build_campaign</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="build_simulation_campaign"><a class="viewcode-back" href="../campaign.html#campaign.build_simulation_campaign">[docs]</a><span class="k">def</span> <span class="nf">build_simulation_campaign</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">sim_scenarios_list</span><span class="p">,</span>
+                              <span class="n">variables_path</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Execute parallel simulations of simulation campaign elements. If there is not enough processors,</span>
+<span class="sd">     a bath is used for queue simulations and distribute among processors.</span>
+
+<span class="sd">     Args:</span>
+
+<span class="sd">    @param max_processors: (int) The max number of cpus to use. By default, all cpus are used.</span>
+<span class="sd">    @param output_dir: (path) The space of structure_file to export.</span>
+<span class="sd">    @param omnet_path: (path) The OMNET++ installation path</span>
+<span class="sd">    @param sim_time: (int) The simulation time. Common for all scenarios.</span>
+<span class="sd">    @param repetitions: (int) The number of runs for each iteration parameter.</span>
+<span class="sd">    @param sim_scenarios: (list) List of selected scenarios to include in the campaign</span>
+<span class="sd">    @param inifile: (path) Path to .ini file of veins project.</span>
+<span class="sd">    @param analyze: (bool) If true execute simulation campaign. Otherwise analyze result files</span>
+<span class="sd">    @param makefile: (path) Path to executable veins project.</span>
+<span class="sd">    @return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Return a dictionary with scenarios as dic keys and read_iteration_variables_from_file as values</span>
+    <span class="n">iteration_variables_dictionary</span><span class="p">,</span> <span class="n">scenario_iteration_variables_dictionary</span> <span class="o">=</span> <span class="n">read_iteration_variables_from_file</span><span class="p">(</span>
+        <span class="n">sim_scenarios_list</span><span class="p">,</span> <span class="n">variables_path</span><span class="p">)</span>
+
+    <span class="c1"># Total number of runs = scenarios * iter variable * repetitions_per_scenario</span>
+    <span class="c1"># return -r 0,1,2,3,4 parameter per scenario according to iter variables</span>
+    <span class="n">total_sims</span><span class="p">,</span> <span class="n">runs_set_dictionary</span> <span class="o">=</span> <span class="n">scenario_runs_set</span><span class="p">(</span><span class="n">scenario_iteration_variables_dictionary</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
+
+    <span class="c1"># simulation campaign information</span>
+    <span class="n">sim_campaign_info</span><span class="p">(</span><span class="n">sim_scenarios_list</span><span class="p">,</span> <span class="n">iteration_variables_dictionary</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">total_sims</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">analyze</span><span class="p">:</span>
+        <span class="c1"># check missing files of simulation campaign</span>
+        <span class="n">missing_files</span><span class="p">(</span><span class="n">total_sims</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">buid_campaign</span><span class="p">():</span>
+            <span class="c1"># create temp ini file for the simulation campaign</span>
+            <span class="n">temp_ini_name</span> <span class="o">=</span> <span class="n">create_temp_ini_file</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span> <span class="n">iteration_variables_dictionary</span><span class="p">)</span>
+
+            <span class="c1"># create results folder</span>
+            <span class="n">new_folder</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">total_sims</span> <span class="o">&lt;=</span> <span class="n">max_processors</span><span class="p">:</span>
+                <span class="n">batch</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># default when b &lt;= 1 enough cpus</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">total_sims</span> <span class="o">/</span> <span class="n">max_processors</span>
+                <span class="n">batch</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+            <span class="c1"># execute parallel simulations</span>
+            <span class="n">parallel</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs_set_dictionary</span><span class="p">,</span> <span class="n">temp_ini_name</span><span class="p">,</span>
+                     <span class="n">sim_scenarios_list</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="missing_files"><a class="viewcode-back" href="../campaign.html#campaign.missing_files">[docs]</a><span class="k">def</span> <span class="nf">missing_files</span><span class="p">(</span><span class="n">total_sims</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check in results folder if there are missing files of simulation campaign</span>
+<span class="sd">    @param total_sims: (int) Total number of runs = scenarios * iter variable * repetitions_per_scenario</span>
+<span class="sd">    @param output_dir: (path) The space of structure_file to export.</span>
+<span class="sd">    @return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Analyze results looking for missing result simulation files</span>
+    <span class="n">files_in_results_folder</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">total_sims</span> <span class="o">==</span> <span class="n">files_in_results_folder</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Files successfully generated: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">total_sims</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Missing files in results folder: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total_sims</span> <span class="o">-</span> <span class="n">files_in_results_folder</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="parallel"><a class="viewcode-back" href="../campaign.html#campaign.parallel">[docs]</a><span class="k">def</span> <span class="nf">parallel</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs_bundle</span><span class="p">,</span> <span class="n">temp_ini_name</span><span class="p">,</span> <span class="n">sim_scenarios_list</span><span class="p">,</span>
+             <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Execute parallel summary. If the number of cpus &lt; # of summary a batch of runs is set</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    @param max_processors: (int) The max number of cpus to use. By default, all cpus are used.</span>
+<span class="sd">    @param omnet_path: (path) Path to the OMNET++ installation.</span>
+<span class="sd">    @param batch: (int) Number of simulations per cpu</span>
+<span class="sd">    @param sim_time: (int) The simulation time. Common for all scenarios.</span>
+<span class="sd">    @param runs_bundle: (int) Bundle of runs (e.g. 0,1,2,3..)</span>
+<span class="sd">    @param temp_ini_name: (string) VEINs ini configuration file name</span>
+<span class="sd">    @param iter_var_per_scenario: (dict) Dictionary with scenarios as keys and iterations as values</span>
+<span class="sd">    @param makefile: (path) Path to executable veins project.</span>
+<span class="sd">    @return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Parallelize simulations</span>
+    <span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s2">&quot;loky&quot;</span><span class="p">):</span>
+        <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">10</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">execute_sim</span><span class="p">)(</span><span class="n">makefile</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs_bundle</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">temp_ini_name</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sim_scenarios_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="new_folder"><a class="viewcode-back" href="../campaign.html#campaign.new_folder">[docs]</a><span class="k">def</span> <span class="nf">new_folder</span><span class="p">(</span><span class="n">new_directory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Create new folder and replace if it exists. Used to creates the results folder where results files are saved.</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">        new_directory (path): Path of the new folder</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">new_directory</span><span class="p">):</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">new_directory</span><span class="p">)</span>  <span class="c1"># Removes all the subdirectories!</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">new_directory</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="folder_permissions"><a class="viewcode-back" href="../campaign.html#campaign.folder_permissions">[docs]</a><span class="k">def</span> <span class="nf">folder_permissions</span><span class="p">(</span><span class="n">veins_exec_project_path</span><span class="p">):</span>
+    <span class="c1"># TO DO assign folder permissions</span>
+    <span class="k">pass</span></div>
+    <span class="c1"># os.chmod(PROJECT_EXECUTABLE, stat.S_IXGRP)</span>
+    <span class="c1"># os.system(&#39;chmod -R +777 {0}&#39;.format(os.path.dirname(PROJECT_EXECUTABLE)))</span>
+    <span class="c1"># os.system(&#39;chmod -R +rwx {0}&#39;.format(os.path.dirname(VEINS_INI_PATH)))</span>
+    <span class="c1"># exec = &#39;{0}/../../src/{1}&#39;.format(temp_ini_name,)  # TO DO find executable</span>
+
+
+<div class="viewcode-block" id="execute_sim"><a class="viewcode-back" href="../campaign.html#campaign.execute_sim">[docs]</a><span class="k">def</span> <span class="nf">execute_sim</span><span class="p">(</span><span class="n">veins_exec_project_path</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">scenario</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs</span><span class="p">,</span> <span class="n">temp_ini_name</span><span class="p">,</span>
+                <span class="n">ned_path</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Execute scenario simulation using OMNET++ funcionality (opp_run all OMNET++ simulation manual  11.20 Running Simulation Campaigns)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    @param veins_exec_project_path: (path) Path to executable veins project.</span>
+<span class="sd">    @param max_processors: (int) The max number of cpus to use. By default, all cpus are used.</span>
+<span class="sd">    @param omnet_path: (path) Path to the OMNET++ installation.</span>
+<span class="sd">    @param scenario: Scenario to simulate</span>
+<span class="sd">    @param batch: Batch of simulations</span>
+<span class="sd">    @param sim_time: (int) The simulation time. Common for all scenarios.</span>
+<span class="sd">    @param runs: Bundle of runs (e.g. 0,1,2,3....)</span>
+<span class="sd">    @param temp_ini_name: (string) VEINs ini configuration file name</span>
+<span class="sd">    @return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="s1">&#39;-n .:../../src/veins &#39;</span>
+    <span class="c1"># Change directory before execute simulation</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">temp_ini_name</span><span class="p">))</span>
+
+    <span class="c1"># Allow executions and file creation in simulations paths</span>
+    <span class="n">folder_permissions</span><span class="p">(</span><span class="n">veins_exec_project_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">isNotBlank</span><span class="p">(</span><span class="n">scenario</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">opp_runall -j</span><span class="si">{1}</span><span class="s1"> -b</span><span class="si">{2}</span><span class="s1"> </span><span class="si">{3}</span><span class="s1"> -u Cmdenv -c </span><span class="si">{4}</span><span class="s1"> -r </span><span class="si">{5}</span><span class="s1"> &#39;</span> \
+              <span class="s1">&#39;-n .:../../src/veins &#39;</span> \
+              <span class="s1">&#39;--cmdenv-performance-display=false &#39;</span> \
+              <span class="s1">&#39;--sim-time-limit=</span><span class="si">{6}</span><span class="s1">s &#39;</span> \
+              <span class="s1">&#39;--cmdenv-redirect-output=true &#39;</span> \
+              <span class="s1">&#39;--cmdenv-express-mode=true &#39;</span> \
+              <span class="s1">&#39;</span><span class="si">{7}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">omnet_path</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">veins_exec_project_path</span><span class="p">,</span> <span class="n">scenario</span><span class="p">,</span> <span class="n">runs</span><span class="p">,</span>
+                           <span class="n">sim_time</span><span class="p">,</span>
+                           <span class="n">temp_ini_name</span><span class="p">)</span>
+
+        <span class="c1"># Execute command</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_log_file</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># TO DO save in log file</span></div>
+
+
+<div class="viewcode-block" id="isNotBlank"><a class="viewcode-back" href="../campaign.html#campaign.isNotBlank">[docs]</a><span class="k">def</span> <span class="nf">isNotBlank</span><span class="p">(</span><span class="n">myString</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if string is empty or null.</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">    @param myString: (string) Any string</span>
+<span class="sd">    @return: (bool)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">myString</span> <span class="ow">and</span> <span class="n">myString</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="clear_memory"><a class="viewcode-back" href="../campaign.html#campaign.clear_memory">[docs]</a><span class="k">def</span> <span class="nf">clear_memory</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Clean memory cache at the end of simulation execution&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>  <span class="c1"># Linux system</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;sync&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;echo 3 &gt; /proc/sys/vm/drop_caches&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;swapoff -a &amp;&amp; swapon -a&#39;</span><span class="p">)</span></div>
+    <span class="c1"># print(&quot;Memory cleaned&quot;)</span>
+
+
+<div class="viewcode-block" id="create_temp_ini_file"><a class="viewcode-back" href="../campaign.html#campaign.create_temp_ini_file">[docs]</a><span class="k">def</span> <span class="nf">create_temp_ini_file</span><span class="p">(</span><span class="n">output_results</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">veins_ini_file_name</span><span class="p">,</span> <span class="n">iteration_variables_dictionary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Instantiates a temp.ini file with simulation campaign configurations.</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">          output_results (path): The space of structure_file to export.</span>
+<span class="sd">          repetitions (int): The number of runs for each iteration parameter.</span>
+<span class="sd">          veins_ini_file_name (path): Path to .ini file of veins project.</span>
+
+
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">veins_ini_file_name</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.ini&#39;</span><span class="p">)</span>
+    <span class="n">temp_file_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.temp.ini&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="c1"># declare variable where results will be save</span>
+    <span class="n">var_save_result_in_ini</span> <span class="o">=</span> <span class="s1">&#39;*.*.appl.filename&#39;</span>  <span class="c1"># TO DO check in ini file a common variable</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;$</span><span class="si">{configname}</span><span class="s1">,$</span><span class="si">{iterationvarsf}</span><span class="s1">,$</span><span class="si">{repetition}</span><span class="s1">&#39;</span>
+    <span class="n">log_output_file</span> <span class="o">=</span> <span class="s1">&#39;cmdenv-output-file&#39;</span>  <span class="c1"># TO DO check in ini file a common variable</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">veins_ini_file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ini_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">temp_ini_file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ini_file</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;repeat =&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="s1">&#39;repeat=&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="n">log_output_file</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">scenario_log_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.out&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                    <span class="n">temp_ini_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> = </span><span class="si">{1}</span><span class="s2">/../logs/</span><span class="si">{2}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">log_output_file</span><span class="p">,</span> <span class="n">output_results</span><span class="p">,</span> <span class="n">scenario_log_name</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="s1">&#39;[Config&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">temp_ini_file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">temp_ini_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;repeat = </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repetitions</span><span class="p">))</span>
+                    <span class="n">add_iteration_variables_to_scenarions_ini_file</span><span class="p">(</span><span class="n">temp_ini_file</span><span class="p">,</span> <span class="n">iteration_variables_dictionary</span><span class="p">)</span>
+                    <span class="n">results_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_results</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                    <span class="n">temp_ini_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> = &quot;</span><span class="si">{1}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_save_result_in_ini</span><span class="p">,</span> <span class="n">results_file_name</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">temp_ini_file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">temp_file_name</span></div>
+
+
+<div class="viewcode-block" id="add_iteration_variables_to_scenarions_ini_file"><a class="viewcode-back" href="../campaign.html#campaign.add_iteration_variables_to_scenarions_ini_file">[docs]</a><span class="k">def</span> <span class="nf">add_iteration_variables_to_scenarions_ini_file</span><span class="p">(</span><span class="n">temp_ini_file</span><span class="p">,</span> <span class="n">iteration_variables_dictionary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scenarios with same iteration variables</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">iteration_variable</span> <span class="ow">in</span> <span class="n">iteration_variables_dictionary</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">iteration_variables_dictionary</span><span class="p">[</span><span class="n">iteration_variable</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
+        <span class="n">temp_ini_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> = $</span><span class="si">{1}{2}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iteration_variable</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">iteration_variables_dictionary</span><span class="p">[</span><span class="n">iteration_variable</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="ask_for_scenarios_to_simulate"><a class="viewcode-back" href="../campaign.html#campaign.ask_for_scenarios_to_simulate">[docs]</a><span class="k">def</span> <span class="nf">ask_for_scenarios_to_simulate</span><span class="p">(</span><span class="n">sim_scenarios_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Select scenarios to include in the simulation campaign</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">        sim_scenarios_list(list): List of scenarios found in .ini file specified as argument</span>
+
+<span class="sd">    @param sim_scenarios_list:</span>
+<span class="sd">    @return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">scenarios_to_simulate</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Select scenarios to simulate (e.g. 1,5,2  default=all): &#39;</span><span class="p">))</span>
+        <span class="c1"># TO DO CHECK VALID SCENARIOS</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Wrong input!. Default value [all]&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">scenarios_to_simulate</span><span class="p">:</span>
+            <span class="n">selected_scenarios_list</span> <span class="o">=</span> <span class="n">sim_scenarios_list</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scenarios_to_simulate</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">scenarios_to_simulate</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+            <span class="n">selected_scenarios_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">sim_scenarios_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">scenarios_to_simulate</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="n">selected_scenarios_list</span></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Pablo Barbecho
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
