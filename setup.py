@@ -1,5 +1,6 @@
 from setuptools import setup
 from os import path
+from osm import cli
 
 local = path.abspath(path.dirname(__file__))
 
@@ -14,7 +15,7 @@ with open(path.join(local, 'LICENSE'), encoding='utf-8') as file:
 setup(
     name='osm',
     url='https://github.com/Pbarbecho/osm.git',
-    version='0.1.0',
+    version='1.2',
     description='Automating OMNeT++ large-scale simulations',
     long_description=readme_file,
     long_description_content_type='text/markdown',
@@ -25,9 +26,10 @@ setup(
     python_requires='>=3.5',
     install_requires=['Click', 'matplotlib', 'numpy ', 'pandas',
                       'pathlib', 'uuid', 'scipy', 'pivottablejs', 'seaborn', 'joblib', 'ipython'],
-    entry_points='''
-        [console_scripts]
-        osm=osm:cli
-    ''',
+    entry_points={
+        'console_scripts': [
+            'osm=osm:cli',
+        ],
+    },
     license="GNU GPL v2",
 )

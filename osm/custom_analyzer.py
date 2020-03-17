@@ -1,12 +1,10 @@
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
-from osm import campaign, merge
+from .campaign import new_folder
+from .summaryzer import parse_if_number, get_iteration_parameters
 import pivottablejs as pj
 import seaborn as sns
-
-
-#sns.set(style="dark", color_codes=True)
 
 
 def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table, iter_parameters_path):
@@ -26,7 +24,7 @@ def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table, it
 
     """
 
-    campaign.new_folder(output_directory)
+    new_folder(output_directory)
     df = pd.read_csv(input_csv_file)
 
     if custom_pivot_table:
@@ -34,7 +32,7 @@ def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table, it
         cmd = 'firefox pivottablejs.html'
         os.system(cmd)
     else:
-        iter_parameters = merge.get_iteration_parameters(iter_parameters_path)
+        iter_parameters = get_iteration_parameters(iter_parameters_path)
         # Examples of custom analyze functions
         node_speed(df, output_directory)
         packet_losses(df, output_directory)
@@ -99,7 +97,7 @@ def node_speed(df, output_directory):
     df["accidentDuration"] = [row.strip('-') for row in df["accidentDuration"]]
 
     # try to convert to numeric
-    if type(merge.parse_if_number(df["accidentDuration"].iloc[0])) == float:
+    if type(parse_if_number(df["accidentDuration"].iloc[0])) == float:
         df["accidentDuration"] = pd.to_numeric(df["accidentDuration"], errors='coerce')
 
     # Filter tx packets
@@ -116,10 +114,3 @@ def node_speed(df, output_directory):
                       legend_out=True, data=tmp_speed)
     fig.set_axis_labels('Accident duration  (s)', 'Speed (m/s)')
     plt.savefig(os.path.join(output_directory, filename), bbox_inches="tight")
-
-"""
-if __name__ == '__main__':
-
-    df = pd.read_csv('/root/Documents/RESULTS/2hGAR/Dropbox/Python_Scripts/msmp/osm/summary/0xb42e99a4017b/results.csv')
-    output_directory = '/root/Documents/RESULTS/2hGAR/Dropbox/Python_Scripts/msmp/osm/analyzer/0xb42e99a4017b/'
-"""
