@@ -7,7 +7,7 @@ import pivottablejs as pj
 import seaborn as sns
 
 
-def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table, iter_parameters_path):
+def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table):
     """
 
     Here, user can edit/customize functions in order to analyze results.
@@ -32,7 +32,6 @@ def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table, it
         cmd = 'firefox pivottablejs.html'
         os.system(cmd)
     else:
-        iter_parameters = get_iteration_parameters(iter_parameters_path)
         # Examples of custom analyze functions
         node_speed(df, output_directory)
         packet_losses(df, output_directory)

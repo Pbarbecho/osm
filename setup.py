@@ -1,6 +1,6 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from os import path
-from osm import cli
+
 
 local = path.abspath(path.dirname(__file__))
 
@@ -23,8 +23,9 @@ setup(
     author='Pablo Barbecho',
     author_email='pablo.barbecho@upc.edu',
     keywords='OMNET++ large-scale simulation manager',
+    packages=find_packages(),
     python_requires='>=3.5',
-    install_requires=['Click', 'matplotlib', 'numpy ', 'pandas',
+    install_requires=['click', 'matplotlib', 'numpy ', 'pandas',
                       'pathlib', 'uuid', 'scipy', 'pivottablejs', 'seaborn', 'joblib', 'ipython'],
     entry_points={
         'console_scripts': [

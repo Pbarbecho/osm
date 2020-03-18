@@ -12,7 +12,7 @@ def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, 
     Return the results relative to the desired parameter space in the form of an xarray data structure.
 
     Args:
-    output_dir: (path) The space of structure_file to export.
+    output_dir: (path) The space of structure to export.
     max_processors: (int) The max number of cpus to use. By default, all cpus are used.
     omnet_path: (path) Path to the OMNET++ installation.
     By default the script try to find the installation path.
@@ -39,8 +39,7 @@ def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, 
 
     # Build the simulation campaign
     build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, repetitions, scenarios_to_sim,
-                              iter_path,
-                              inifile, analyze, makefile, nedfile, verbose)
+                              iter_path, inifile, analyze, makefile, nedfile, verbose)
 
     # clear memory, swap after simulations
     clear_memory()
@@ -68,7 +67,7 @@ def get_scenarios(veins_ini_file):
 
 def read_iteration_variables_from_file(scenarios_to_sim, iter_parameters_file_path):
     """
-    Get the number of iteration structure_file (defined as specified in OMNET++ Simulation manual 10.4 Parameter Studies)
+    Get the number of iteration structure (defined as specified in OMNET++ Simulation manual 10.4 Parameter Studies)
     of each scenario (sim_scenarios) defined in .ini file.
 
     e.g. OMNET++ study parameter definition -> *.numHosts = ${1, 2, 5, 10..50 step 10}
@@ -91,7 +90,6 @@ def read_iteration_variables_from_file(scenarios_to_sim, iter_parameters_file_pa
             for line in ini_file:
                 if isNotBlank(line):
                     ivar, value = line.split('=')
-                    print(ivar)
                     temp, units = value.split('}')
                     temp = temp.strip().strip('{')
                     vlist = temp.strip().split(',')
@@ -163,7 +161,7 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
      Args:
 
     @param max_processors: (int) The max number of cpus to use. By default, all cpus are used.
-    @param output_dir: (path) The space of structure_file to export.
+    @param output_dir: (path) The space of structure to export.
     @param omnet_path: (path) The OMNET++ installation path
     @param sim_time: (int) The simulation time. Common for all scenarios.
     @param repetitions: (int) The number of runs for each iteration parameter.
@@ -205,15 +203,14 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
                 batch = math.ceil(b)
 
             # execute parallel simulations
-            parallel(max_processors, omnet_path, batch, sim_time, runs_set_dictionary, temp_ini_name,
-                     sim_scenarios_list, makefile, nedfile, verbose)
+            parallel(max_processors, omnet_path, batch, sim_time, runs_set_dictionary, temp_ini_name, sim_scenarios_list, makefile, verbose)
 
 
 def missing_files(total_sims, output_dir):
     """
     Check in results folder if there are missing files of simulation campaign
     @param total_sims: (int) Total number of runs = scenarios * iter variable * repetitions_per_scenario
-    @param output_dir: (path) The space of structure_file to export.
+    @param output_dir: (path) The space of structure to export.
     @return:
     """
 
@@ -226,7 +223,7 @@ def missing_files(total_sims, output_dir):
 
 
 def parallel(max_processors, omnet_path, batch, sim_time, runs_bundle, temp_ini_name, sim_scenarios_list,
-             makefile, nedfile, verbose):
+             makefile, verbose):
     """
     Execute parallel summary. If the number of cpus < # of summary a batch of runs is set
 
@@ -244,7 +241,7 @@ def parallel(max_processors, omnet_path, batch, sim_time, runs_bundle, temp_ini_
 
     # Parallelize simulations
     with parallel_backend("loky"):
-        Parallel(n_jobs=max_processors, verbose=10)(delayed(execute_sim)(makefile, max_processors, omnet_path, k, batch, sim_time, runs_bundle[k], temp_ini_name, nedfile, verbose) for k in sim_scenarios_list)
+        Parallel(n_jobs=max_processors, verbose=10)(delayed(execute_sim)(makefile, max_processors, omnet_path, k, batch, sim_time, runs_bundle[k], temp_ini_name, verbose) for k in sim_scenarios_list)
 
 
 def new_folder(new_directory):
@@ -269,7 +266,7 @@ def folder_permissions(veins_exec_project_path):
 
 
 def execute_sim(veins_exec_project_path, max_processors, omnet_path, scenario, batch, sim_time, runs, temp_ini_name,
-                ned_path, verbose):
+                verbose):
     """
     Execute scenario simulation using OMNET++ funcionality (opp_run all OMNET++ simulation manual  11.20 Running Simulation Campaigns)
 
@@ -283,6 +280,7 @@ def execute_sim(veins_exec_project_path, max_processors, omnet_path, scenario, b
     @param runs: Bundle of runs (e.g. 0,1,2,3....)
     @param temp_ini_name: (string) VEINs ini configuration file name
     @return:
+    :param verbose:
     """
 
     '-n .:../../src/veins '
@@ -300,9 +298,7 @@ def execute_sim(veins_exec_project_path, max_processors, omnet_path, scenario, b
               '--cmdenv-redirect-output=true ' \
               '--cmdenv-express-mode=true ' \
               '{7}'.format(omnet_path, max_processors, batch, veins_exec_project_path, scenario, runs,
-                           sim_time,
-                           temp_ini_name)
-
+                           sim_time, temp_ini_name)
         # Execute command
         if verbose:
             os.system(cmd)
@@ -339,7 +335,7 @@ def create_temp_ini_file(output_results, repetitions, veins_ini_file_name, itera
      Instantiates a temp.ini file with simulation campaign configurations.
 
      Args:
-          output_results (path): The space of structure_file to export.
+          output_results (path): The space of structure to export.
           repetitions (int): The number of runs for each iteration parameter.
           veins_ini_file_name (path): Path to .ini file of veins project.
 

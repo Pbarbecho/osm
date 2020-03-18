@@ -2,17 +2,14 @@ import multiprocessing
 import os
 import subprocess
 import uuid
+import osm
 import click
-from .custom_analyzer import custom_filter_plots
-from .build_executable import project
-from .campaign import run
-from .summaryzer import merge_files
 
 
 class Config(object):
     def __init__(self):
         self.verbose = False
-        self.results_directory = os.path.dirname(os.path.abspath(__file__))
+        self.parents_dir = os.path.dirname(os.path.abspath('{}/..'.format(__file__)))
         self.mac = (hex(uuid.getnode()))  # mac to identify computer where simmualtions have been performed
         self.processors = multiprocessing.cpu_count()
 
@@ -21,22 +18,15 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 
 
 @click.group()
-@click.option('-v', '--verbose', is_flag=True)
-@click.option('-iter', '--iteration-variables-path',
-              type=click.Path(exists=True, resolve_path=True),
-              help='Path to iteration structure_file file containing iterations variables and values')
+@click.option('-v', is_flag=True, help=' verbose')
 @pass_config
-def cli(config, verbose, iteration_variables_path):
+def cli(config, v):
     """
 
-     A command line interface to the OMNET++/VEINs simulation manager.
+    CLI OSM Simulation manager. Execute large-scale OMNeT++ simulations.
 
     """
-    config.verbose = verbose
-    config.results_directory = os.path.dirname(os.path.abspath(__file__))
-    if iteration_variables_path is None:
-        iteration_variables_path = os.path.join(config.results_directory, 'variables')
-    config.iteration_variables_path = iteration_variables_path
+    config.verbose = v # verbose
 
 
 ###########
@@ -54,13 +44,13 @@ def cli(config, verbose, iteration_variables_path):
 def build(config, project_directory, ext, filename):
     """
 
-    Quick option to execute opp_makemake comand (OMNeT++ tool) to build the project executable file
+    Compile the project.
 
     """
 
     if ext not in ['cc', 'ccp']:
         ext = 'cc'
-    project(project_directory, ext, filename)
+    osm.project(project_directory, ext, filename)
 
 
 ##########
@@ -86,9 +76,9 @@ def build(config, project_directory, ext, filename):
               help='Number of repetitions.')
 @click.option('-a', '--analyze', is_flag=True,
               help='Analyze a group of files from a previous simulation campaign, looking for missing files.')
-@click.option('-v', '--variables-path',
+@click.option('-add', '--additional-files-path',
               type=click.Path(exists=True, resolve_path=True),
-              help='Path to iteration structure_file file containing iterations variables and values')
+              help='Path to iteration varibles and structure files. [default: parents directory]')
 @click.option('--ned-file',  # path to .NED file
               type=click.Path(exists=True, resolve_path=True),
               help='path to .NED files')
@@ -97,34 +87,29 @@ def build(config, project_directory, ext, filename):
 @click.argument('makefile',  # path to veins executable project
                 type=click.Path(exists=True, resolve_path=True))
 @pass_config
-def launcher(config, omnet_path, output_dir, max_processes, sim_time, repetitions, analyze, variables_path, inifile,
+def launcher(config, omnet_path, output_dir, max_processes, sim_time, repetitions, analyze, additional_files_path,
+             inifile,
              makefile, ned_file):
     """
-    Run OMNET++/VEINS simulation campaign
-    ======================================
+    Build and run the simulation campaign
 
     Inputs: OMNET, VEINs installation paths. VEINs .ini file name and executable project name.
-    Output: Simulation results per scenario with the following output names structure:
-
-            scenario,iter_parameter,iter_parameter,...,repetition.txt
+    Output: Simulation result per iteration in simulation campaign.
 
     """
 
-    click.echo('\n Setting program paths....')
-    if variables_path is None:
-        variables_path = os.path.join(config.results_directory, 'variables')
-    if output_dir is None:
-        output_dir = os.path.join(config.results_directory, 'results', config.mac)
-    if omnet_path is None:
-        omnet_path = get_omnetpp_installation_path('omnetpp')  # default
-        if config.verbose:
-            click.echo(omnet_path)
+    if config.verbose: click.echo('\n Setting program paths....')
+    if additional_files_path is None:variables_path = os.path.join(config.parents_dir, 'variables')
+    if output_dir is None: output_dir = os.path.join(config.parents_dir, 'results', config.mac)
+    if omnet_path is None: omnet_path = get_omnetpp_installation_path('omnetpp')  # Try to get OMNeT++ installation
+    if config.verbose:click.echo(omnet_path)
 
+    # Try to get maximum number of processor and update setting
     updated_max_processes = get_MAX_PROCESS(config, max_processes)
 
     # Execute OMNET/VEINS simulation campaign
-    run(output_dir, updated_max_processes, omnet_path, sim_time, repetitions, analyze, variables_path, inifile,
-        makefile, ned_file, config.verbose)
+    osm.run(output_dir, updated_max_processes, omnet_path, sim_time, repetitions, analyze, variables_path, inifile,
+            makefile, ned_file, config.verbose)
 
 
 def get_MAX_PROCESS(config, max_processes):
@@ -176,32 +161,26 @@ def get_omnetpp_installation_path(app):
               default="results.csv",
               show_default=False,
               help="Filename with supported extension .npy (Numpy), .mat (Matlab) or csv (Comma-separated values).")
-@click.option('--eval-path',
+@click.option('-add', '--additional-files-path',
               type=click.Path(exists=True, resolve_path=True),
-              help='Path to iteration structure_file file containing iterations variables and values')
+              help='Path to iteration varibles and structure files. [default: parents directory]')
 @pass_config
-def parser(config, max_processes, input_dir, output_dir, output_filename, eval_path):
+def parser(config, max_processes, input_dir, output_dir, output_filename, additional_files_path):
     """
     Merge simulation campaign result files into one single output file.
     In case of OMNeT++ files are found in result files directory, OMNeT++ scavetool is used to generate .csv output file.
 
-    Input: Results folder, iteration structure_file file (*not required in case of OMNeT results).
+    Input: Results folder, iteration structure file (*not required in case of OMNeT results).
     Output: File extension Numpy .npy.
 
     """
-    if output_dir is None:
-        # Default output directory
-        output_dir = os.path.join(config.results_directory, 'summary', config.mac)
-    if input_dir is None:
-        # Default directory
-        input_dir = os.path.join(config.results_directory, 'results', config.mac)
-    if eval_path is None:
-        eval_path = os.path.join(config.results_directory, 'structure_file')
+    if output_dir is None: output_dir = os.path.join(config.parents_dir, 'summary', config.mac)
+    if input_dir is None: input_dir = os.path.join(config.parents_dir, 'results', config.mac)
+    if additional_files_path is None: additional_files_path = os.path.join(config.parents_dir)
     if os.path.exists(input_dir) and os.listdir(input_dir):
         updated_max_processes = get_MAX_PROCESS(config, max_processes)
         # Parser
-        merge_files(input_dir, output_dir, output_filename, eval_path, updated_max_processes,
-                    config.iteration_variables_path)
+        osm.merge_files(input_dir, output_dir, output_filename, additional_files_path, updated_max_processes)
     else:
         click.echo('No such file or directory or is empty: {}'.format(input_dir))
 
@@ -216,27 +195,22 @@ def parser(config, max_processes, input_dir, output_dir, output_filename, eval_p
 @click.option('-o', '--output-dir',
               type=click.Path(exists=True, resolve_path=True),
               help='Path to directory where custom analyzed factors are saved.')
-@click.option('-ipt', '--interactive-pivot-table', is_flag=True,
+@click.option('-plt', '--interactive-pivot-table', is_flag=True,
               help='GUI in firefox to drag columns and plot resutls dataframe.')
 @pass_config
 def analyzer(config, input_cvs_file, output_dir, interactive_pivot_table):
     """
     Custom Analyzer
 
-    Input: Results folder, iteration structure_file file (*not required in case of OMNeT results).
+    Input: Results folder, iteration structure file (*not required in case of OMNeT results).
     Output: File extension Numpy .npy.
 
     """
 
-    if output_dir is None:
-        # Default output directory
-        output_dir = os.path.join(config.results_directory, 'analyzer', config.mac)
-    if input_cvs_file is None:
-        # Default directory
-        input_cvs_file = os.path.join(config.results_directory, 'summary', config.mac, 'results.csv')
+    if output_dir is None: output_dir = os.path.join(config.parents_dir, 'analyzer', config.mac)
+    if input_cvs_file is None: input_cvs_file = os.path.join(config.parents_dir, 'summary', config.mac, 'results.csv')
     if os.path.exists(input_cvs_file):
         # Analyzer
-        custom_filter_plots(input_cvs_file, output_dir, interactive_pivot_table,
-                            config.iteration_variables_path)
+        osm.custom_filter_plots(input_cvs_file, output_dir, interactive_pivot_table)
     else:
         click.echo('No such file or directory or is empty: {}'.format(input_cvs_file))

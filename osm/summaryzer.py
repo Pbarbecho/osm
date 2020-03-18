@@ -29,19 +29,22 @@ def wrapper_scavetool(input_files_directory, output_directory, output_filename):
     os.system(cmd)
 
 
-def merge_files(input_files_directory, output_directory, output_filename, eval_path, max_processes, variables_path):
+def merge_files(input_files_directory, output_directory, output_filename, additional_files_path, max_processes):
     """
 
     Merge repetitions executed per scenario in one output file.
     Add statistics (mean, standard deviation).
 
-    Input: Directory with results files. File with evaluation structure_file (i.e., Parameters evaluated in project)
+    Input: Directory with results files. File with evaluation structure (i.e., Parameters evaluated in project)
     Output: One output file (*.npy, *.mat *.csv).
 
     """
 
     # Read simulation campaign results in results folder
     result_files = os.listdir(input_files_directory)
+    # List additional files directory
+    variables_path = os.path.join(additional_files_path, 'variables')
+    structure_file_path = os.path.join(additional_files_path, 'structure')
 
     omnet_files = False
     for file in result_files:
@@ -61,8 +64,8 @@ def merge_files(input_files_directory, output_directory, output_filename, eval_p
         # Read iteration parameter to insert in file structure
         iteration_parameters_list = get_iteration_parameters(variables_path)
 
-        # Read structure_file
-        e_parameters = get_parameters(eval_path)
+        # Read structure
+        e_parameters = get_parameters(structure_file_path)
 
         # results data frame
         total_results_df = pd.DataFrame()
@@ -102,7 +105,7 @@ def build_results_df(input_files_directory, filename, structure, iteration_param
     Additional columns are add (filename, scenario, repetition) from the file name for grouping purposes.
     """
 
-    #iteration_parameters_list = iteration_parameters_list[::-1]
+    iteration_parameters_list = iteration_parameters_list[::-1]
     # read data and build a dataframe
     with open(os.path.join(input_files_directory, filename), 'r') as file:
         value = [line.strip().split(',') for line in file]
@@ -133,7 +136,7 @@ def build_results_df(input_files_directory, filename, structure, iteration_param
         return df_results
 
     else:
-        print('Number of structure_file must be equal to structure_file in results files!!!')
+        print('Number of structure must be equal to structure in results files!!!')
         sys.exit()
 
 
@@ -152,16 +155,16 @@ def parse_if_number(s):
 def get_parameters(eval_path):
     """
 
-    Return a list of structure_file to sort the results table.
+    Return a list of structure to sort the results table.
     It must be consistent with gathered values in the project.
 
-    Structure in structure_file external file:
+    Structure in structure external file:
 
             parm1,parm2,parm3,.....
 
     """
 
-    # Read structure_file
+    # Read structure
     with open(eval_path, 'r') as eval_file:
         for line in eval_file:
             if isNotBlank(line):
