@@ -37,6 +37,7 @@ Typically, the following is enough:
 
 ```bash
 pip install -U pipenv
+pip3 install --user -U https://github.com/Pbarbecho/osm/archive/master.zip
 ```
 
 ## Clone the source repository from Github ##

@@ -7,7 +7,7 @@ import subprocess
 
 
 def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, iter_path, inifile,
-        makefile, nedfile, verbose):
+        makefile, verbose):
     """
     Return the results relative to the desired parameter space in the form of an xarray data structure.
 
@@ -39,7 +39,7 @@ def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, 
 
     # Build the simulation campaign
     build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, repetitions, scenarios_to_sim,
-                              iter_path, inifile, analyze, makefile, nedfile, verbose)
+                              iter_path, inifile, analyze, makefile, verbose)
 
     # clear memory, swap after simulations
     clear_memory()
@@ -153,7 +153,7 @@ def buid_campaign():
 
 
 def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, repetitions, sim_scenarios_list,
-                              variables_path, inifile, analyze, makefile, nedfile, verbose):
+                              variables_path, inifile, analyze, makefile, verbose):
     """
      Execute parallel simulations of simulation campaign elements. If there is not enough processors,
      a bath is used for queue simulations and distribute among processors.
