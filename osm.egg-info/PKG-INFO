@@ -1,4 +1,4 @@
-Metadata-Version: 1.0
+Metadata-Version: 2.1
 Name: osm
 Version: 1.2
 Summary: Automating OMNeT++ large-scale simulations
@@ -65,3 +65,5 @@ Description: <p align="center">
         [rtd]: https://omnetsimulationmanager.readthedocs.io
 Keywords: OMNET++ large-scale simulation manager
 Platform: UNKNOWN
+Requires-Python: >=3.5
+Description-Content-Type: text/markdown

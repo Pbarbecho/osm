@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from .campaign import new_folder
-from .summaryzer import parse_if_number, get_iteration_parameters
+from .summaryzer import parse_if_number
 import pivottablejs as pj
 import seaborn as sns
 

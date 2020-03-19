@@ -8,4 +8,4 @@ ovsm
    campaign
    custom_analyzer
    merge
-   ovsm
+

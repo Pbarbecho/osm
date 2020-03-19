@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>campaign &mdash; ovsm 0.1.0 documentation</title>
+  <title>campaign &mdash; osm 0.1.0 documentation</title>
   
 
   
@@ -48,7 +48,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> ovsm
+            <a href="../index.html" class="icon icon-home"> osm
           
 
           
@@ -94,7 +94,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">ovsm</a>
+          <a href="../index.html">osm</a>
         
       </nav>
 
@@ -152,12 +152,12 @@
 
 
 <div class="viewcode-block" id="run"><a class="viewcode-back" href="../campaign.html#campaign.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">iter_path</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span>
-        <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+        <span class="n">makefile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the results relative to the desired parameter space in the form of an xarray data structure.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    output_dir: (path) The space of structure_file to export.</span>
+<span class="sd">    output_dir: (path) The space of structure to export.</span>
 <span class="sd">    max_processors: (int) The max number of cpus to use. By default, all cpus are used.</span>
 <span class="sd">    omnet_path: (path) Path to the OMNET++ installation.</span>
 <span class="sd">    By default the script try to find the installation path.</span>
@@ -184,8 +184,7 @@
 
     <span class="c1"># Build the simulation campaign</span>
     <span class="n">build_simulation_campaign</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">scenarios_to_sim</span><span class="p">,</span>
-                              <span class="n">iter_path</span><span class="p">,</span>
-                              <span class="n">inifile</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+                              <span class="n">iter_path</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
     <span class="c1"># clear memory, swap after simulations</span>
     <span class="n">clear_memory</span><span class="p">()</span></div>
@@ -213,7 +212,7 @@
 
 <div class="viewcode-block" id="read_iteration_variables_from_file"><a class="viewcode-back" href="../campaign.html#campaign.read_iteration_variables_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_iteration_variables_from_file</span><span class="p">(</span><span class="n">scenarios_to_sim</span><span class="p">,</span> <span class="n">iter_parameters_file_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the number of iteration structure_file (defined as specified in OMNET++ Simulation manual 10.4 Parameter Studies)</span>
+<span class="sd">    Get the number of iteration structure (defined as specified in OMNET++ Simulation manual 10.4 Parameter Studies)</span>
 <span class="sd">    of each scenario (sim_scenarios) defined in .ini file.</span>
 
 <span class="sd">    e.g. OMNET++ study parameter definition -&gt; *.numHosts = ${1, 2, 5, 10..50 step 10}</span>
@@ -236,7 +235,6 @@
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ini_file</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">isNotBlank</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
                     <span class="n">ivar</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">ivar</span><span class="p">)</span>
                     <span class="n">temp</span><span class="p">,</span> <span class="n">units</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
                     <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">)</span>
                     <span class="n">vlist</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
@@ -300,7 +298,7 @@
 
 
 <div class="viewcode-block" id="build_simulation_campaign"><a class="viewcode-back" href="../campaign.html#campaign.build_simulation_campaign">[docs]</a><span class="k">def</span> <span class="nf">build_simulation_campaign</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">sim_scenarios_list</span><span class="p">,</span>
-                              <span class="n">variables_path</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+                              <span class="n">variables_path</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">     Execute parallel simulations of simulation campaign elements. If there is not enough processors,</span>
 <span class="sd">     a bath is used for queue simulations and distribute among processors.</span>
@@ -308,7 +306,7 @@
 <span class="sd">     Args:</span>
 
 <span class="sd">    @param max_processors: (int) The max number of cpus to use. By default, all cpus are used.</span>
-<span class="sd">    @param output_dir: (path) The space of structure_file to export.</span>
+<span class="sd">    @param output_dir: (path) The space of structure to export.</span>
 <span class="sd">    @param omnet_path: (path) The OMNET++ installation path</span>
 <span class="sd">    @param sim_time: (int) The simulation time. Common for all scenarios.</span>
 <span class="sd">    @param repetitions: (int) The number of runs for each iteration parameter.</span>
@@ -350,15 +348,14 @@
                 <span class="n">batch</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 
             <span class="c1"># execute parallel simulations</span>
-            <span class="n">parallel</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs_set_dictionary</span><span class="p">,</span> <span class="n">temp_ini_name</span><span class="p">,</span>
-                     <span class="n">sim_scenarios_list</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span></div>
+            <span class="n">parallel</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs_set_dictionary</span><span class="p">,</span> <span class="n">temp_ini_name</span><span class="p">,</span> <span class="n">sim_scenarios_list</span><span class="p">,</span> <span class="n">makefile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="missing_files"><a class="viewcode-back" href="../campaign.html#campaign.missing_files">[docs]</a><span class="k">def</span> <span class="nf">missing_files</span><span class="p">(</span><span class="n">total_sims</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check in results folder if there are missing files of simulation campaign</span>
 <span class="sd">    @param total_sims: (int) Total number of runs = scenarios * iter variable * repetitions_per_scenario</span>
-<span class="sd">    @param output_dir: (path) The space of structure_file to export.</span>
+<span class="sd">    @param output_dir: (path) The space of structure to export.</span>
 <span class="sd">    @return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -371,7 +368,7 @@
 
 
 <div class="viewcode-block" id="parallel"><a class="viewcode-back" href="../campaign.html#campaign.parallel">[docs]</a><span class="k">def</span> <span class="nf">parallel</span><span class="p">(</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs_bundle</span><span class="p">,</span> <span class="n">temp_ini_name</span><span class="p">,</span> <span class="n">sim_scenarios_list</span><span class="p">,</span>
-             <span class="n">makefile</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+             <span class="n">makefile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Execute parallel summary. If the number of cpus &lt; # of summary a batch of runs is set</span>
 
@@ -389,7 +386,7 @@
 
     <span class="c1"># Parallelize simulations</span>
     <span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s2">&quot;loky&quot;</span><span class="p">):</span>
-        <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">10</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">execute_sim</span><span class="p">)(</span><span class="n">makefile</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs_bundle</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">temp_ini_name</span><span class="p">,</span> <span class="n">nedfile</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sim_scenarios_list</span><span class="p">)</span></div>
+        <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">max_processors</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">10</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">execute_sim</span><span class="p">)(</span><span class="n">makefile</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs_bundle</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">temp_ini_name</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sim_scenarios_list</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="new_folder"><a class="viewcode-back" href="../campaign.html#campaign.new_folder">[docs]</a><span class="k">def</span> <span class="nf">new_folder</span><span class="p">(</span><span class="n">new_directory</span><span class="p">):</span>
@@ -414,7 +411,7 @@
 
 
 <div class="viewcode-block" id="execute_sim"><a class="viewcode-back" href="../campaign.html#campaign.execute_sim">[docs]</a><span class="k">def</span> <span class="nf">execute_sim</span><span class="p">(</span><span class="n">veins_exec_project_path</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">scenario</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">runs</span><span class="p">,</span> <span class="n">temp_ini_name</span><span class="p">,</span>
-                <span class="n">ned_path</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+                <span class="n">verbose</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Execute scenario simulation using OMNET++ funcionality (opp_run all OMNET++ simulation manual  11.20 Running Simulation Campaigns)</span>
 
@@ -428,6 +425,7 @@
 <span class="sd">    @param runs: Bundle of runs (e.g. 0,1,2,3....)</span>
 <span class="sd">    @param temp_ini_name: (string) VEINs ini configuration file name</span>
 <span class="sd">    @return:</span>
+<span class="sd">    :param verbose:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="s1">&#39;-n .:../../src/veins &#39;</span>
@@ -445,9 +443,7 @@
               <span class="s1">&#39;--cmdenv-redirect-output=true &#39;</span> \
               <span class="s1">&#39;--cmdenv-express-mode=true &#39;</span> \
               <span class="s1">&#39;</span><span class="si">{7}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">omnet_path</span><span class="p">,</span> <span class="n">max_processors</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">veins_exec_project_path</span><span class="p">,</span> <span class="n">scenario</span><span class="p">,</span> <span class="n">runs</span><span class="p">,</span>
-                           <span class="n">sim_time</span><span class="p">,</span>
-                           <span class="n">temp_ini_name</span><span class="p">)</span>
-
+                           <span class="n">sim_time</span><span class="p">,</span> <span class="n">temp_ini_name</span><span class="p">)</span>
         <span class="c1"># Execute command</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
@@ -484,7 +480,7 @@
 <span class="sd">     Instantiates a temp.ini file with simulation campaign configurations.</span>
 
 <span class="sd">     Args:</span>
-<span class="sd">          output_results (path): The space of structure_file to export.</span>
+<span class="sd">          output_results (path): The space of structure to export.</span>
 <span class="sd">          repetitions (int): The number of runs for each iteration parameter.</span>
 <span class="sd">          veins_ini_file_name (path): Path to .ini file of veins project.</span>
 

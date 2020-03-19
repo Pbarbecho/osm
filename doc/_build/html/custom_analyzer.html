@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>custom_analyzer module &mdash; ovsm 0.1.0 documentation</title>
+  <title>custom_analyzer module &mdash; osm 0.1.0 documentation</title>
   
 
   
@@ -50,7 +50,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> ovsm
+            <a href="index.html" class="icon icon-home"> osm
           
 
           
@@ -86,7 +86,6 @@
 <li class="toctree-l2"><a class="reference internal" href="campaign.html">campaign module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">custom_analyzer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="merge.html">merge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ovsm.html">ovsm module</a></li>
 </ul>
 </li>
 </ul>
@@ -103,7 +102,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">ovsm</a>
+          <a href="index.html">osm</a>
         
       </nav>
 
@@ -155,8 +154,49 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="custom-analyzer-module">
-<h1>custom_analyzer module<a class="headerlink" href="#custom-analyzer-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-custom_analyzer">
+<span id="custom-analyzer-module"></span><h1>custom_analyzer module<a class="headerlink" href="#module-custom_analyzer" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="custom_analyzer.custom_filter_plots">
+<code class="sig-prename descclassname">custom_analyzer.</code><code class="sig-name descname">custom_filter_plots</code><span class="sig-paren">(</span><em class="sig-param">input_csv_file</em>, <em class="sig-param">output_directory</em>, <em class="sig-param">custom_pivot_table</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/custom_analyzer.html#custom_filter_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#custom_analyzer.custom_filter_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Here, user can edit/customize functions in order to analyze results.
+If interactive pivot table is true, an interactive (drag) panel containing
+the pivot table will appear inside a browser (Integrated with Jupyter).</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>Parse file containing all results from simulation campaign.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>Custom filtered/sorted data files
+Customized plots (custom or using interactive pivot tables)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="custom_analyzer.node_speed">
+<code class="sig-prename descclassname">custom_analyzer.</code><code class="sig-name descname">node_speed</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">output_directory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/custom_analyzer.html#node_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#custom_analyzer.node_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Example of filtering nodes mean speed.</p>
+<dl class="simple">
+<dt>Input:</dt><dd><p>csv file containing parse file</p>
+</dd>
+<dt>Output:</dt><dd><p>csv file containing mean speed of all simulations in simulation campaign
+custom bar plot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="custom_analyzer.packet_losses">
+<code class="sig-prename descclassname">custom_analyzer.</code><code class="sig-name descname">packet_losses</code><span class="sig-paren">(</span><em class="sig-param">tmp</em>, <em class="sig-param">output_directory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/custom_analyzer.html#packet_losses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#custom_analyzer.packet_losses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Example of filtering/groping and computing percentage of packet Losses (%PL).</p>
+<dl class="simple">
+<dt>Input:</dt><dd><p>csv file containing parse file</p>
+</dd>
+<dt>Output:</dt><dd><p>csv file containing %PL
+custom bar plot</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

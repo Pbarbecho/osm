@@ -6,7 +6,7 @@
 Automating large-scale simulations for OMNeT++
 ==============================================
 
-OVSM framework allows to OMNeT++ users to quickly and easily execute large-scale network simulations. Three shell commands (including help context) are available:
+OSM allows to OMNeT++ users to quickly and easily execute large-scale network simulations. Three shell commands (including help context) are available:
 
 .. code:: bash
 

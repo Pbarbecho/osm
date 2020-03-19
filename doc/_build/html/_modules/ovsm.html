@@ -1,0 +1,433 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ovsm &mdash; osm 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> osm
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">ovsm</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">osm</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>ovsm</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ovsm</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">import</span> <span class="nn">campaign</span>
+<span class="kn">import</span> <span class="nn">merge</span>
+<span class="kn">import</span> <span class="nn">custom_analyzer</span>
+<span class="kn">import</span> <span class="nn">build_executable</span>
+
+
+<div class="viewcode-block" id="Config"><a class="viewcode-back" href="../ovsm.html#ovsm.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mac</span> <span class="o">=</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">getnode</span><span class="p">()))</span>  <span class="c1"># mac to identify computer where simmualtions have been performed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processors</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span></div>
+
+
+<span class="n">pass_config</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">make_pass_decorator</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="n">ensure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-iter&#39;</span><span class="p">,</span> <span class="s1">&#39;--iteration-variables-path&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to iteration structure_file file containing iterations variables and values&#39;</span><span class="p">)</span>
+<span class="nd">@pass_config</span>
+<span class="k">def</span> <span class="nf">cli</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">iteration_variables_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">     A command line interface to the OMNET++/VEINs simulation manager.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">results_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">iteration_variables_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">iteration_variables_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">results_directory</span><span class="p">,</span> <span class="s1">&#39;variables&#39;</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">iteration_variables_path</span> <span class="o">=</span> <span class="n">iteration_variables_path</span>
+
+
+<span class="c1">###########</span>
+<span class="c1"># Compile #</span>
+<span class="c1">###########</span>
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;project-directory&#39;</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--ext&#39;</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39; C++ source file extension, usually &quot;cc&quot; or &quot;cpp&quot;.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--filename&#39;</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of simulation executable to be built.&#39;</span>
+                   <span class="s1">&#39;folder&#39;</span><span class="p">)</span>
+<span class="nd">@pass_config</span>
+<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">project_directory</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Quick option to execute opp_makemake comand (OMNeT++ tool) to build the project executable file</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cc&#39;</span><span class="p">,</span> <span class="s1">&#39;ccp&#39;</span><span class="p">]:</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="s1">&#39;cc&#39;</span>
+    <span class="n">build_executable</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">project_directory</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+
+<span class="c1">##########</span>
+<span class="c1"># Launch #</span>
+<span class="c1">##########</span>
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--omnet-path&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;OMNET++ installation directory&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--output-dir&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to directory where results are saved.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--max-processes&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The maximum number of parallel simulations. By default available cpus are used.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--sim-time&#39;</span><span class="p">,</span> <span class="s1">&#39;-t&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+              <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Simulation time. Common for all scenarios in simulation campaign.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--repetitions&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of repetitions.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--analyze&#39;</span><span class="p">,</span>  <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Analyze a group of files from a previous simulation campaign, looking for missing files.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--variables-path&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to iteration structure_file file containing iterations variables and values&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--ned-file&#39;</span><span class="p">,</span>  <span class="c1"># path to .NED file</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;path to .NED files&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;inifile&#39;</span><span class="p">,</span>     <span class="c1"># path to veins ini file project</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;makefile&#39;</span><span class="p">,</span>  <span class="c1"># path to veins executable project</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nd">@pass_config</span>
+<span class="k">def</span> <span class="nf">launcher</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">max_processes</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">variables_path</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span>
+             <span class="n">makefile</span><span class="p">,</span> <span class="n">ned_file</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run OMNET++/VEINS simulation campaign.</span>
+<span class="sd">    ======================================</span>
+
+<span class="sd">    Inputs: OMNET, VEINs installation paths. VEINs .ini file name and executable project name.</span>
+<span class="sd">    Output: Simulation results per scenario with the following output names structure:</span>
+
+<span class="sd">            scenario,iter_parameter,iter_parameter,...,repetition.txt</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Setting program paths....&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">variables_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">variables_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">results_directory</span><span class="p">,</span> <span class="s1">&#39;variables&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">results_directory</span><span class="p">,</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">mac</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">omnet_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">omnet_path</span> <span class="o">=</span> <span class="n">get_omnetpp_installation_path</span><span class="p">(</span><span class="s1">&#39;omnetpp&#39;</span><span class="p">)</span>  <span class="c1"># default</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">omnet_path</span><span class="p">)</span>
+
+    <span class="n">updated_max_processes</span> <span class="o">=</span> <span class="n">get_MAX_PROCESS</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">max_processes</span><span class="p">)</span>
+
+    <span class="c1"># Execute OMNET/VEINS simulation campaign</span>
+    <span class="n">campaign</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">updated_max_processes</span><span class="p">,</span> <span class="n">omnet_path</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">variables_path</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span>
+                 <span class="n">makefile</span><span class="p">,</span> <span class="n">ned_file</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_MAX_PROCESS"><a class="viewcode-back" href="../ovsm.html#ovsm.get_MAX_PROCESS">[docs]</a><span class="k">def</span> <span class="nf">get_MAX_PROCESS</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">max_processes</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">max_processes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># By default the max number of cpus are try to used in simulations</span>
+        <span class="n">max_processes</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">processors</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">processors</span> <span class="o">&lt;</span> <span class="n">max_processes</span><span class="p">:</span>
+            <span class="n">max_processes</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">processors</span>
+    <span class="k">return</span> <span class="n">max_processes</span></div>
+
+
+<div class="viewcode-block" id="get_omnetpp_installation_path"><a class="viewcode-back" href="../ovsm.html#ovsm.get_omnetpp_installation_path">[docs]</a><span class="k">def</span> <span class="nf">get_omnetpp_installation_path</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If no path to OMNeT++ installation is pass. The script try to find OMNet++ installation path. In case of</span>
+<span class="sd">    more than one OMNeT++ instance is found the first is chosen.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        application: &#39;omnetpp&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;whereis&#39;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;nt&#39;</span> <span class="k">else</span> <span class="s1">&#39;which&#39;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">getoutput</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">app</span><span class="p">))</span>
+    <span class="n">app_instance</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;omnetpp:&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">app_instance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> More than one OMNET installation found !!!&#39;</span><span class="p">)</span>
+        <span class="c1"># TO DO menu to select OMNet++ instance</span>
+        <span class="k">return</span> <span class="n">app_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;omnetpp&#39;</span><span class="p">)</span>  <span class="c1"># default first installation instance</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">app_instance</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;omnetpp&#39;</span><span class="p">)</span></div>
+
+
+<span class="c1">##########</span>
+<span class="c1"># Parser #</span>
+<span class="c1">##########</span>
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--max-processes&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The maximum number of parallel simulations. By default available cpus are used.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;--input-dir&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Directory containing simulations results.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--output-dir&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to directory where output file is saved.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-O&#39;</span><span class="p">,</span> <span class="s1">&#39;--output-filename&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="s2">&quot;results.csv&quot;</span><span class="p">,</span>
+              <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Filename with supported extension .npy (Numpy), .mat (Matlab) or csv (Comma-separated values).&quot;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--eval-path&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to iteration structure_file file containing iterations variables and values&#39;</span><span class="p">)</span>
+<span class="nd">@pass_config</span>
+<span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">max_processes</span><span class="p">,</span> <span class="n">input_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">,</span> <span class="n">eval_path</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merge simulation campaign result files into one single output file.</span>
+<span class="sd">    In case of OMNeT++ files are found in result files directory, OMNeT++ scavetool is used to generate .csv output file.</span>
+
+<span class="sd">    Input: Results folder, iteration structure_file file (*not required in case of OMNeT results).</span>
+<span class="sd">    Output: File extension Numpy .npy.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Default output directory</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">results_directory</span><span class="p">,</span> <span class="s1">&#39;summary&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">mac</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">input_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Default directory</span>
+        <span class="n">input_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">results_directory</span><span class="p">,</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">mac</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">eval_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">eval_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">results_directory</span><span class="p">,</span> <span class="s1">&#39;structure_file&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">input_dir</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">input_dir</span><span class="p">):</span>
+        <span class="n">updated_max_processes</span> <span class="o">=</span> <span class="n">get_MAX_PROCESS</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">max_processes</span><span class="p">)</span>
+        <span class="c1"># Parser</span>
+        <span class="n">merge</span><span class="o">.</span><span class="n">merge_files</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">,</span> <span class="n">eval_path</span><span class="p">,</span> <span class="n">updated_max_processes</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">iteration_variables_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;No such file or directory or is empty: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">input_dir</span><span class="p">))</span>
+
+
+<span class="c1">############</span>
+<span class="c1"># Analyzer #</span>
+<span class="c1">############</span>
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;--input-cvs-file&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Input .csv file with merge results&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--output-dir&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolve_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to directory where custom analyzed factors are saved.&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-ipt&#39;</span><span class="p">,</span> <span class="s1">&#39;--interactive-pivot-table&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;GUI in firefox to drag columns and plot resutls dataframe.&#39;</span><span class="p">)</span>
+<span class="nd">@pass_config</span>
+<span class="k">def</span> <span class="nf">analyzer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">input_cvs_file</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">interactive_pivot_table</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom Analyzer</span>
+
+<span class="sd">    Input: Results folder, iteration structure_file file (*not required in case of OMNeT results).</span>
+<span class="sd">    Output: File extension Numpy .npy.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Default output directory</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">results_directory</span><span class="p">,</span> <span class="s1">&#39;analyzer&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">mac</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">input_cvs_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Default directory</span>
+        <span class="n">input_cvs_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">results_directory</span><span class="p">,</span> <span class="s1">&#39;summary&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">mac</span><span class="p">,</span> <span class="s1">&#39;results.csv&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">input_cvs_file</span><span class="p">):</span>
+        <span class="c1"># Analyzer</span>
+        <span class="n">custom_analyzer</span><span class="o">.</span><span class="n">custom_filter_plots</span><span class="p">(</span><span class="n">input_cvs_file</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">interactive_pivot_table</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">iteration_variables_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;No such file or directory or is empty: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">input_cvs_file</span><span class="p">))</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Pablo Barbecho
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

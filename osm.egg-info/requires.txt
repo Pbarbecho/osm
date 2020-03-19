@@ -1,4 +1,4 @@
-Click
+click
 matplotlib
 numpy
 pandas
