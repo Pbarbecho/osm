@@ -15,7 +15,7 @@ with open(path.join(local, 'LICENSE'), encoding='utf-8') as file:
 setup(
     name='osm',
     url='https://github.com/Pbarbecho/osm.git',
-    version='1.2',
+    version='1.0',
     description='Automating OMNeT++ large-scale simulations',
     long_description=readme_file,
     long_description_content_type='text/markdown',

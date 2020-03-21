@@ -4,7 +4,7 @@ import subprocess
 import numpy as np
 import pandas as pd
 import scipy.io as sio
-from .campaign import isNotBlank, new_folder
+from osm.campaign import isNotBlank, new_folder
 from joblib import Parallel, delayed, parallel_backend
 
 

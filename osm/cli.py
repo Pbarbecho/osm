@@ -29,30 +29,6 @@ def cli(config, v):
     config.verbose = v # verbose
 
 
-###########
-# Compile #
-###########
-@cli.command()
-@click.argument('project-directory',
-                type=click.Path(exists=True, resolve_path=True))
-@click.option('-e', '--ext',
-              help=' C++ source file extension, usually "cc" or "cpp".')
-@click.option('-o', '--filename',
-              help='Name of simulation executable to be built.'
-                   'folder')
-@pass_config
-def build(config, project_directory, ext, filename):
-    """
-
-    Compile the project.
-
-    """
-
-    if ext not in ['cc', 'ccp']:
-        ext = 'cc'
-    osm.project(project_directory, ext, filename)
-
-
 ##########
 # Launch #
 ##########
@@ -65,7 +41,7 @@ def build(config, project_directory, ext, filename):
               help='Path to directory where results are saved.')
 @click.option('--max-processes',
               default=1,
-              help='The maximum number of parallel simulations. By default available cpus are used.')
+              help='The maximum number of parallel simulations. [ default available cpus are used ]')
 @click.option('--sim-time', '-t',
               default=300,
               show_default=True,
@@ -79,23 +55,15 @@ def build(config, project_directory, ext, filename):
 @click.option('-add', '--additional-files-path',
               type=click.Path(exists=True, resolve_path=True),
               help='Path to iteration varibles and structure files. [default: parents directory]')
-@click.option('--ned-file',  # path to .NED file
-              type=click.Path(exists=True, resolve_path=True),
-              help='path to .NED files')
 @click.argument('inifile',  # path to veins ini file project
                 type=click.Path(exists=True, resolve_path=True))
 @click.argument('makefile',  # path to veins executable project
                 type=click.Path(exists=True, resolve_path=True))
 @pass_config
 def launcher(config, omnet_path, output_dir, max_processes, sim_time, repetitions, analyze, additional_files_path,
-             inifile,
-             makefile, ned_file):
+             inifile, makefile):
     """
-    Build and run the simulation campaign
-
-    Inputs: OMNET, VEINs installation paths. VEINs .ini file name and executable project name.
-    Output: Simulation result per iteration in simulation campaign.
-
+    Build and run the simulation campaign.
     """
 
     if config.verbose: click.echo('\n Setting program paths....')
@@ -167,12 +135,7 @@ def get_omnetpp_installation_path(app):
 @pass_config
 def parser(config, max_processes, input_dir, output_dir, output_filename, additional_files_path):
     """
-    Merge simulation campaign result files into one single output file.
-    In case of OMNeT++ files are found in result files directory, OMNeT++ scavetool is used to generate .csv output file.
-
-    Input: Results folder, iteration structure file (*not required in case of OMNeT results).
-    Output: File extension Numpy .npy.
-
+    Merge result files into one single output file (.npy, .mat, .csv).
     """
     if output_dir is None: output_dir = os.path.join(config.parents_dir, 'summary', config.mac)
     if input_dir is None: input_dir = os.path.join(config.parents_dir, 'results', config.mac)
@@ -200,11 +163,7 @@ def parser(config, max_processes, input_dir, output_dir, output_filename, additi
 @pass_config
 def analyzer(config, input_cvs_file, output_dir, interactive_pivot_table):
     """
-    Custom Analyzer
-
-    Input: Results folder, iteration structure file (*not required in case of OMNeT results).
-    Output: File extension Numpy .npy.
-
+    Customized filtering and plotting.
     """
 
     if output_dir is None: output_dir = os.path.join(config.parents_dir, 'analyzer', config.mac)

@@ -1,7 +1,7 @@
-ovsm module
+osm module
 ===========
 
-.. automodule:: ovsm
+.. automodule:: osm
    :members:
    :undoc-members:
    :show-inheritance:

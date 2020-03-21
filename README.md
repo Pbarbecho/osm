@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo/logo.png" width="400">
+  <img src="doc/logo.png" width="400">
 </p>
 
 # Automating OMNeT++ simulations tool OVSM #
@@ -28,15 +28,9 @@ OSM tool includes the following tool:
 ```
 
 
-## Downloading the module ##
-
-This module is developed using
-[`pipenv`](https://pipenv.readthedocs.io/en/latest/): in order to correctly
-manage virtual environments and install dependencies, make sure it is installed.
-Typically, the following is enough:
+## Downloading modules ##
 
 ```bash
-pip install -U pipenv
 pip3 install --user -U https://github.com/Pbarbecho/osm/archive/master.zip
 ```
 
@@ -44,15 +38,11 @@ pip3 install --user -U https://github.com/Pbarbecho/osm/archive/master.zip
 
 On the command line, enter:
 ```bash
-git clone https://github.com/Pbarbecho/ovsm.git
+git clone https://github.com/Pbarbecho/ovm.git
 ```
-
-## Running tests ##
-
-## Running examples ##
 
 ## Authors ##
 
 Pablo Barbecho
 
-[rtd]: https://omnetsimulationmanager.readthedocs.io
+[rtd]: https://simulationmanagerforomnet.readthedocs.io

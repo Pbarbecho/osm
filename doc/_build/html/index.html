@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Automating large-scale simulations for OMNeT++ &mdash; osm 0.1.0 documentation</title>
+  <title>Automating large-scale simulations for OMNeT++ &mdash; osm 1.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="ovsm" href="modules.html" /> 
+    <link rel="next" title="Installation" href="installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -79,8 +79,12 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">ovsm</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Automating large-scale simulations for OMNeT++</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
 </ul>
 
             
@@ -148,6 +152,7 @@
   <div class="section" id="automating-large-scale-simulations-for-omnet">
 <h1>Automating large-scale simulations for OMNeT++<a class="headerlink" href="#automating-large-scale-simulations-for-omnet" title="Permalink to this headline">¶</a></h1>
 <p>OSM allows to OMNeT++ users to quickly and easily execute large-scale network simulations. Three shell commands (including help context) are available:</p>
+<p>OSM on Github: <a class="reference external" href="https://github.com/Pbarbecho/osm">https://github.com/Pbarbecho/osm</a></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build and lauch the simulation campaign</span>
 <span class="nv">$ovsm</span> launcher <span class="o">[</span>OPTIONS<span class="o">]</span> INIFILE MAKEFILE
 
@@ -161,33 +166,33 @@
 <div class="section" id="feature-highlights">
 <h2>Feature highlights<a class="headerlink" href="#feature-highlights" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Abstraction from the model;</p></li>
+<li><p>Supports Python &gt;= 3.5;</p></li>
 <li><p>Fine grane control of the simulation campaign;</p></li>
+<li><p>Customizable/interactive plotting</p></li>
 <li><p>Runs parallelized simulations and post-processing for large number of files (common in large-scale simulations);</p></li>
 </ul>
 </div>
 <div class="section" id="user-s-guide">
 <h2>User’s guide<a class="headerlink" href="#user-s-guide" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">ovsm</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="build_executable.html">build_executable module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="campaign.html">campaign module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="custom_analyzer.html">custom_analyzer module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="merge.html">merge module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#via-pip">Via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#clone-repository">Clone repository</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#getting-help">Getting help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#build-and-run-the-simulation-campaign">Build and run the simulation campaign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#parsing-simulation-results">Parsing simulation results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#analyzing-simulation-results">Analyzing simulation results</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
 </div>
 
 
@@ -198,7 +203,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="modules.html" class="btn btn-neutral float-right" title="ovsm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
