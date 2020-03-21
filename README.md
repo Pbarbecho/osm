@@ -5,6 +5,8 @@
 # Automating OMNeT++ simulations tool OVSM #
 
 [![Documentation Status](https://readthedocs.org/projects/osm/badge/?version=latest)](https://osm.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/Pbarbecho/osm/branch/master/graph/badge.svg)](https://codecov.io/gh/Pbarbecho/osm)
+
 
 OSM allows to OMNeT++ users to quickly and easily execute large-scale network simulations. 
 This is an automation tool for OMNeT++ large-scale simulations and data analysis.
