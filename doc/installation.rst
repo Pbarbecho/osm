@@ -1,13 +1,13 @@
 Installation
 ============
 
-First, we recommend to install a virtual environment::
+First, we recommend to install a virtualenv::
 
     $pip3 install pipenv
 
 Via pip
 -------
-Then, OSM can be installed by pip from the master branch::
+Then, OSM is developed using pipenv. It can be installed from the master branch::
 
     pip3 install --user -U https://github.com/Pbarbecho/osm/archive/master.zip
 

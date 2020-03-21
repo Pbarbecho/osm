@@ -1,4 +1,4 @@
-ovsm
+osm
 ====
 
 .. toctree::

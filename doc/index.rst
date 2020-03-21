@@ -35,11 +35,6 @@ Feature highlights
 User's guide
 ------------
 .. toctree::
-   :hidden:
-
-   self
-
-.. toctree::
    :maxdepth: 2
 
    installation

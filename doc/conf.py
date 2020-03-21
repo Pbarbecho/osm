@@ -22,7 +22,7 @@ copyright = '2020, Pablo Barbecho'
 author = 'Pablo Barbecho'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '1.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,9 +40,6 @@ extensions = [
     'sphinx.ext.napoleon'
 ]
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
-
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
@@ -52,7 +49,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 html_sidebars = {
-    'index': ['links.html', 'searchbox.html'],
+    'index': ['searchbox.html'],
     '**': ['home.html', 'localtoc.html', 'relations.html', 'searchbox.html']
     }
 
