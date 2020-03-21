@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>osm module &mdash; osm 1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> osm
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">osm</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>osm module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/osm.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-osm">
+<span id="osm-module"></span><h1>osm module<a class="headerlink" href="#module-osm" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="osm.custom_filter_plots">
+<code class="sig-prename descclassname">osm.</code><code class="sig-name descname">custom_filter_plots</code><span class="sig-paren">(</span><em class="sig-param">input_csv_file</em>, <em class="sig-param">output_directory</em>, <em class="sig-param">custom_pivot_table</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/osm/custom_analyzer.html#custom_filter_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#osm.custom_filter_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Here, user can edit/customize functions in order to analyze results.
+If interactive pivot table is true, an interactive (drag) panel containing
+the pivot table will appear inside a browser (Integrated with Jupyter).</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>Parse file containing all results from simulation campaign.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>Custom filtered/sorted data files
+Customized plots (custom or using interactive pivot tables)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="osm.run">
+<code class="sig-prename descclassname">osm.</code><code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">output_dir</em>, <em class="sig-param">max_processors</em>, <em class="sig-param">omnet_path</em>, <em class="sig-param">sim_time</em>, <em class="sig-param">repetitions</em>, <em class="sig-param">analyze</em>, <em class="sig-param">iter_path</em>, <em class="sig-param">inifile</em>, <em class="sig-param">makefile</em>, <em class="sig-param">verbose</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/osm/campaign.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#osm.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the results relative to the desired parameter space in the form of an xarray data structure.</p>
+<p>Args:
+output_dir: (path) The space of structure to export.
+max_processors: (int) The max number of cpus to use. By default, all cpus are used.
+omnet_path: (path) Path to the OMNET++ installation.
+By default the script try to find the installation path.
+sim_time: (int) The simulation time. Common for all scenarios.
+repetitions: (int) The number of runs for each iteration parameter.
+analyze: (bool) If true execute simulation campaign. Otherwise analyze result files
+from a simulation campaign to find missing simulations.
+inifile: (path) Path to .ini file of veins project.
+makefile: (path) Path to executable veins project.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="osm.merge_files">
+<code class="sig-prename descclassname">osm.</code><code class="sig-name descname">merge_files</code><span class="sig-paren">(</span><em class="sig-param">input_files_directory</em>, <em class="sig-param">output_directory</em>, <em class="sig-param">output_filename</em>, <em class="sig-param">additional_files_path</em>, <em class="sig-param">max_processes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/osm/summaryzer.html#merge_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#osm.merge_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge repetitions executed per scenario in one output file.
+Add statistics (mean, standard deviation).</p>
+<p>Input: Directory with results files. File with evaluation structure (i.e., Parameters evaluated in project)
+Output: One output file (<a href="#id1"><span class="problematic" id="id2">*</span></a>.npy, <a href="#id3"><span class="problematic" id="id4">*</span></a>.mat <a href="#id5"><span class="problematic" id="id6">*</span></a>.csv).</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Pablo Barbecho
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
