@@ -17,10 +17,10 @@ OSM on Github: `<https://github.com/Pbarbecho/osm>`_
   $ovsm launcher [OPTIONS] INIFILE MAKEFILE
 
   # Summarize result files located in output folder
-  $ovsm parser [OPTIONS] 
+  $ovsm parser [OPTIONS]
 
-  # Analyze summarized file 
-  $ovsm analyzer [OPTIONS] 
+  # Analyze summarized file
+  $ovsm analyzer [OPTIONS]
 
 
 Feature highlights
@@ -40,3 +40,9 @@ User's guide
    installation
    cli
 
+Code Documentation
+--------------------
+.. toctree::
+   :maxdepth: 2
+
+   modules
