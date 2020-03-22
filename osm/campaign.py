@@ -6,8 +6,7 @@ from joblib import Parallel, delayed, parallel_backend
 import subprocess
 
 
-def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, iter_path, inifile,
-        makefile, verbose):
+def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, iter_path, inifile, makefile, verbose):
     """
     Return the results relative to the desired parameter space in the form of an xarray data structure.
 
@@ -84,6 +83,8 @@ def read_iteration_variables_from_file(scenarios_to_sim, iter_parameters_file_pa
     """
     dic_iter_vars = {}
     dic_scenario_iter_vars = {}
+
+    iter_parameters_file_path = os.path.join(iter_parameters_file_path, 'variables')
 
     for s in scenarios_to_sim:
         with open(iter_parameters_file_path, 'r') as ini_file:
