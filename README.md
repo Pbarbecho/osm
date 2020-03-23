@@ -2,7 +2,7 @@
   <img src="doc/logo.png" width="400">
 </p>
 
-# Automating OMNeT++ simulations tool OVSM #
+# Automating OMNeT++ simulations#
 
 OSM allows to OMNeT++ users to quickly and easily execute large-scale network simulations. 
 This is an automation tool for OMNeT++ large-scale simulations and data analysis.
