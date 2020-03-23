@@ -8,9 +8,6 @@ Automating large-scale simulations for OMNeT++
 
 OSM allows to OMNeT++ users to quickly and easily execute large-scale network simulations. Three shell commands (including help context) are available:
 
-OSM on Github: `<https://github.com/Pbarbecho/osm>`_
-
-
 .. code:: bash
 
   # Build and lauch the simulation campaign
@@ -46,3 +43,7 @@ Code Documentation
    :maxdepth: 2
 
    modules
+
+Links
+------
+   Github: `<https://github.com/Pbarbecho/osm>`_

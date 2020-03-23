@@ -4,10 +4,6 @@
 
 # Automating OMNeT++ simulations tool OVSM #
 
-[![Documentation Status](https://readthedocs.org/projects/osm/badge/?version=latest)](https://osm.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/Pbarbecho/osm/branch/master/graph/badge.svg)](https://codecov.io/gh/Pbarbecho/osm)
-
-
 OSM allows to OMNeT++ users to quickly and easily execute large-scale network simulations. 
 This is an automation tool for OMNeT++ large-scale simulations and data analysis.
 Based on OMNeT++ structure, this tool reads .ini file and build simulation campaign.
@@ -31,6 +27,9 @@ OSM tool includes the following tool:
   $ovsm analyzer [OPTIONS] 
 ```
 
+[![Documentation Status](https://readthedocs.org/projects/osm/badge/?version=latest)](https://osm.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/Pbarbecho/osm/branch/master/graph/badge.svg)](https://codecov.io/gh/Pbarbecho/osm)
+
 
 ## Downloading modules ##
 
@@ -49,4 +48,4 @@ git clone https://github.com/Pbarbecho/ovm.git
 
 Pablo Barbecho
 
-[rtd]: https://simulationmanagerforomnet.readthedocs.io
+[rtd]: https://osm.readthedocs.io/en/latest/
