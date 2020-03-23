@@ -33,16 +33,42 @@ OSM tool includes the following tool:
 
 ## Downloading modules ##
 
+Install osm using pip:
 ```bash
 pip3 install --user -U https://github.com/Pbarbecho/osm/archive/master.zip
 ```
 
-## Clone the source repository from Github ##
+Depending on the operating system, you may need to add ~/.local/bin to your path. The pip will warn you about this in the installation. In case of user want to uninstall osm: 
 
-On the command line, enter:
 ```bash
-git clone https://github.com/Pbarbecho/ovm.git
+pip3 uninstall osm
 ```
+
+
+## Clone the source repository from Github ##
+First, we recommend to install osm on a virtual environment:
+```bash
+pip3 install pipenv
+```
+
+To clone and install the osm repository, on the command line, enter:
+```bash
+git clone https://github.com/Pbarbecho/osm.git
+```
+
+Then, for use the new virtual environment instantiate a sub-shell as follows:
+
+```bash
+pipenv shell
+```
+
+On the new venv, install osm:
+
+```bash
+pipenv install osm/
+```
+
+At this time, you can interact with the osm modules, customize you analysis and use osm utilities. 
 
 ## Authors ##
 
