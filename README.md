@@ -38,20 +38,23 @@ Install osm using pip:
 pip3 install --user -U https://github.com/Pbarbecho/osm/archive/master.zip
 ```
 
-Depending on the operating system, you may need to add ~/.local/bin to your path. The pip will warn you about this in the installation. In case of user want to uninstall osm: 
+Depending on the operating system, you may need to add ~/.local/bin to your path. During the installation you will be warned about this.
+ 
+ 
+In case you want to uninstall osm package: 
 
 ```bash
 pip3 uninstall osm
 ```
 
 
-## Clone the source repository from Github ##
-First, we recommend to install osm on a virtual environment:
+## Clone the repository ##
+The osm package is developed using a pipenv. TO install osm on a virtual environment:
 ```bash
 pip3 install pipenv
 ```
 
-To clone and install the osm repository, on the command line, enter:
+To clone the osm repository, on the command line, enter:
 ```bash
 git clone https://github.com/Pbarbecho/osm.git
 ```
