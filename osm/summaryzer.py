@@ -4,9 +4,9 @@ import subprocess
 import numpy as np
 import pandas as pd
 import scipy.io as sio
+import dask.dataframe as dd
 from osm.campaign import isNotBlank, new_folder
 from joblib import Parallel, delayed, parallel_backend
-import dask.dataframe as dd
 
 
 def wrapper_scavetool(input_files_directory, output_directory, output_filename):
