@@ -140,12 +140,12 @@ def parser(config, max_processes, input_dir, output_dir, output_filename, additi
     if output_dir is None: output_dir = os.path.join(config.parents_dir, 'summary', config.mac)
     if input_dir is None: input_dir = os.path.join(config.parents_dir, 'results', config.mac)
     if additional_files_path is None: additional_files_path = os.path.join(config.parents_dir)
-    if os.path.exists(input_dir) and os.listdir(input_dir):
+    if os.path.exists(input_dir) and os.listdir(input_dir) and os.path.exists(additional_files_path):
         updated_max_processes = get_MAX_PROCESS(config, max_processes)
         # Parser
         osm.merge_files(input_dir, output_dir, output_filename, additional_files_path, updated_max_processes)
     else:
-        click.echo('No such file or directory or is empty: {}'.format(input_dir))
+        click.echo('No such file or directory or is empty: {} or {}'.format(input_dir, additional_files_path))
 
 
 ############
