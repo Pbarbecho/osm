@@ -26,7 +26,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.5',
     install_requires=['click', 'matplotlib', 'numpy ', 'pandas',
-                      'pathlib', 'uuid', 'scipy', 'pivottablejs', 'seaborn', 'joblib', 'ipython', 'dask'],
+                      'pathlib', 'uuid', 'scipy', 'pivottablejs', 'seaborn', 'joblib', 'ipython', 'dask.dataframe'],
     entry_points={
         'console_scripts': [
             'osm=osm:cli',
