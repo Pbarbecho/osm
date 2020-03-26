@@ -6,6 +6,7 @@ import pandas as pd
 import scipy.io as sio
 from osm.campaign import isNotBlank, new_folder
 from joblib import Parallel, delayed, parallel_backend
+import dask.dataframe as dd
 
 
 def wrapper_scavetool(input_files_directory, output_directory, output_filename):
@@ -112,7 +113,6 @@ def build_results_df(input_files_directory, filename, structure, iteration_param
     values = np.array(value)
 
     if len(values[0]) == len(structure):
-
         # build dataframe from result file and structure file (contains the columns names)
         df_results = pd.DataFrame(values, columns=structure)
         # assign numeric type to columns
@@ -172,7 +172,7 @@ def get_parameters(eval_path):
     return eval_param
 
 
-def save_simulation_results(sim_summary, output_directory, file_name):
+def save_simulation_results(results_summary, output_directory, file_name):
     """
 
     Export results to file to supported file extension.
@@ -186,10 +186,12 @@ def save_simulation_results(sim_summary, output_directory, file_name):
 
     new_folder(output_directory)
     name, ext = file_name.split('.')
-    if ext in ['npy', 'NPY']:
-        np.save(os.path.join(output_directory, file_name), sim_summary)
-    elif ext in ['mat', 'MAT']:
-        sio.savemat(os.path.join(output_directory, file_name), sim_summary)
+    if ext in ['mat', 'MAT']:
+        sio.savemat(os.path.join(output_directory, file_name), results_summary)
     else:
-        # default csv file
-        sim_summary.to_csv(os.path.join(output_directory, file_name), index=None, header=True)
+        sim_summary = dd.from_pandas(results_summary, npartitions=20)
+        if ext in ['npy', 'NPY']:
+            np.save(os.path.join(output_directory, file_name), sim_summary)
+        else:
+            # default csv file
+            sim_summary.to_csv(os.path.join(output_directory, file_name), index=None, header=True, single_file=True)

@@ -31,6 +31,8 @@ def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table):
         pj.pivot_ui(df)
         cmd = 'firefox pivottablejs.html'
         os.system(cmd)
+
+
     else:
         # Examples of custom analyze functions
         node_speed(df, output_directory)
@@ -39,6 +41,7 @@ def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table):
         # Print outputs
         print('\nFiles generated: ')
         [print(' {}) {}'.format(i, file)) for i, file in enumerate(os.listdir(output_directory))]
+
 
 
 def packet_losses(tmp, output_directory):
