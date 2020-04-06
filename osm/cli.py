@@ -133,7 +133,7 @@ def get_omnetpp_installation_path(app):
               type=click.Path(exists=True, resolve_path=True),
               help='Path to iteration varibles and structure files. [default: parents directory]')
 @pass_config
-def parser(config, max_processes, input_dir, output_dir, output_filename, additional_files_path):
+def summarizer(config, max_processes, input_dir, output_dir, output_filename, additional_files_path):
     """
     Merge result files into one single output file (.npy, .mat, .csv).
     """

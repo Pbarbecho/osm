@@ -261,8 +261,8 @@ def folder_permissions(veins_exec_project_path):
     # TO DO assign folder permissions
     pass
     # os.chmod(PROJECT_EXECUTABLE, stat.S_IXGRP)
-    # os.system('chmod -R +777 {0}'.format(os.path.dirname(PROJECT_EXECUTABLE)))
-    # os.system('chmod -R +rwx {0}'.format(os.path.dirname(VEINS_INI_PATH)))
+    # os.system('chmod -R +x {0}'.format(os.path.dirname(PROJECT_EXECUTABLE)))
+    # os.system('chmod -R +x {0}'.format(os.path.dirname(VEINS_INI_PATH)))
     # exec = '{0}/../../src/{1}'.format(temp_ini_name,)  # TO DO find executable
 
 

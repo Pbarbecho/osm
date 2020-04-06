@@ -1,2 +1,2 @@
-*.node[*0].veinsmobility.accidentDuration = {0, 50, 300}s
-*.node[*].appl.beaconInterval = {1, 30, 60, 90}s
+*.node[*0].veinsmobility.accidentDuration = {0, 50, 300, 400}s
+*.node[*].appl.beaconInterval = {1, 30, 90}s

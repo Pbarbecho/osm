@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from osm.campaign import new_folder
-from osm.summarizer import parse_if_number
+from osm.default_summarizer import parse_if_number
 import pivottablejs as pj
 import seaborn as sns
 
