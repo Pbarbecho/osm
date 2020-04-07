@@ -18,13 +18,13 @@ OSM tool includes the following tool:
 
 ```bash
   # Build and lauch the simulation campaign
-  $ovsm launcher [OPTIONS] INIFILE MAKEFILE
+  $osm launcher [OPTIONS] INIFILE MAKEFILE
 
   # Summarize result files located in output folder
-  $ovsm parser [OPTIONS] 
+  $osm parser [OPTIONS] 
 
   # Analyze summarized file 
-  $ovsm analyzer [OPTIONS] 
+  $osm analyzer [OPTIONS] 
 ```
 
 [![Documentation Status](https://readthedocs.org/projects/osm/badge/?version=latest)](https://osm.readthedocs.io/en/latest/?badge=latest)
