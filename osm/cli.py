@@ -70,14 +70,16 @@ def launcher(config, omnet_path, output_dir, max_processes, sim_time, repetition
     if additional_files_path is None: additional_files_path = os.path.join(config.parents_dir)
     if output_dir is None: output_dir = os.path.join(config.parents_dir, 'results', config.mac)
     if omnet_path is None: omnet_path = get_omnetpp_installation_path('omnetpp')  # Try to get OMNeT++ installation
-    if config.verbose:click.echo(omnet_path)
 
-    # Try to get maximum number of processor and update setting
-    updated_max_processes = get_MAX_PROCESS(config, max_processes)
-
-    # Execute OMNET/VEINS simulation campaign
-    osm.run(output_dir, updated_max_processes, omnet_path, sim_time, repetitions, analyze, additional_files_path, inifile,
-            makefile, config.verbose)
+    if os.path.exists(omnet_path) and os.path.exists(additional_files_path):
+        if config.verbose: click.echo(omnet_path)
+        updated_max_processes = get_MAX_PROCESS(config, max_processes)
+        # Execute OMNET/VEINS simulation campaign
+        osm.run(output_dir, updated_max_processes, omnet_path, sim_time, repetitions, analyze, additional_files_path,
+                inifile,
+                makefile, config.verbose)
+    else:
+        click.echo('No such file or directory or is empty: {} or {}'.format(omnet_path, additional_files_path))
 
 
 def get_MAX_PROCESS(config, max_processes):
