@@ -68,6 +68,7 @@ def launcher(config, omnet_path, output_dir, max_processes, sim_time, repetition
 
     if config.verbose: click.echo('\n Setting program paths....')
     if additional_files_path is None: additional_files_path = os.path.join(config.parents_dir)
+    click.echo(additional_files_path)
     if output_dir is None: output_dir = os.path.join(config.parents_dir, 'results', config.mac)
     if omnet_path is None: omnet_path = get_omnetpp_installation_path('omnetpp')  # Try to get OMNeT++ installation
 
