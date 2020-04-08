@@ -11,13 +11,13 @@ OSM allows to OMNeT++ users to quickly and easily execute large-scale network si
 .. code:: bash
 
   # Build and lauch the simulation campaign
-  $ovsm launcher [OPTIONS] INIFILE MAKEFILE
+  $osm launcher [OPTIONS] INIFILE MAKEFILE
 
   # Summarize result files located in output folder
-  $ovsm parser [OPTIONS]
+  $osm parser [OPTIONS]
 
   # Analyze summarized file
-  $ovsm analyzer [OPTIONS]
+  $osm analyzer [OPTIONS]
 
 
 Feature highlights
