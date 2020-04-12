@@ -139,7 +139,7 @@ def sim_campaign_info(scenarios_to_sim, iteration_variables_dictionary, repetiti
           "\n Simulation time: {4}s"
           "\n Total Runs: {5}".format(scenarios_to_sim, len(list(iteration_variables_dictionary.keys())), iter_var, repetitions,
                                            simtime, total_sims))
-    print('-' * len(banner),'\n')
+    print('-' * len(banner), '\n')
 
 
 def run_simulations():

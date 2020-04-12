@@ -73,10 +73,10 @@ def launcher(config, omnet_path, output_dir, ned_files_dir, max_processes, sim_t
     if output_dir is None: output_dir = os.path.join(config.parents_dir, 'results', config.mac)
     if omnet_path is None: omnet_path = get_omnetpp_installation_path('omnetpp')  # Try to get OMNeT++ installation
     if ned_files_dir is None: ned_files_dir = '.'
-    click.echo('\nNED files directory: {}'.format(ned_files_dir))
-
     if os.path.exists(omnet_path) and os.path.exists(additional_files_path):
-        if config.verbose: click.echo(omnet_path)
+        if config.verbose:
+            click.echo(' OMNeT++ installation: {}'.format(omnet_path))
+            click.echo(' NED files directory: {}'.format(ned_files_dir))
         updated_max_processes = get_MAX_PROCESS(config, max_processes)
         # Execute OMNET simulation campaign
         osm.run(output_dir, updated_max_processes, omnet_path, sim_time, repetitions, analyze, additional_files_path,
@@ -111,7 +111,7 @@ def get_omnetpp_installation_path(app):
     if len(app_instance) > 1:
         click.echo('\n More than one OMNET installation found !!!')
         # TO DO menu to select OMNet++ instance
-        return app_instance[0].strip('omnetpp')  # default first installation instance
+        return app_instance[1].strip('omnetpp')  # default first installation instance
     else:
         return app_instance.strip('omnetpp')
 
