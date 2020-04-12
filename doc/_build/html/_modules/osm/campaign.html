@@ -288,7 +288,7 @@
                                            <span class="n">simtime</span><span class="p">,</span> <span class="n">total_sims</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">buid_campaign</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">run_simulations</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">s_build_campaign</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39; Build simulation campaign (*Y/N): &#39;</span><span class="p">))</span>
     <span class="k">except</span><span class="p">:</span>
@@ -337,7 +337,7 @@
 
     <span class="k">else</span><span class="p">:</span>
 
-        <span class="k">if</span> <span class="n">buid_campaign</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">run_simulations</span><span class="p">():</span>
             <span class="c1"># create temp ini file for the simulation campaign</span>
             <span class="n">temp_ini_name</span> <span class="o">=</span> <span class="n">create_temp_ini_file</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">,</span> <span class="n">inifile</span><span class="p">,</span> <span class="n">iteration_variables_dictionary</span><span class="p">)</span>
 

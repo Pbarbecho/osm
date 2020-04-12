@@ -6,7 +6,7 @@ from joblib import Parallel, delayed, parallel_backend
 import subprocess
 
 
-def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, iter_path, inifile, makefile, verbose):
+def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, iter_path, inifile, makefile, verbose, NED_files_dir):
     """
     Return the results relative to the desired parameter space in the form of an xarray data structure.
 
@@ -38,7 +38,7 @@ def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, 
 
     # Build the simulation campaign
     build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, repetitions, scenarios_to_sim,
-                              iter_path, inifile, analyze, makefile, verbose)
+                              iter_path, inifile, analyze, makefile, verbose, NED_files_dir)
 
     # clear memory, swap after simulations
     clear_memory()
@@ -130,19 +130,21 @@ def sim_campaign_info(scenarios_to_sim, iteration_variables_dictionary, repetiti
      Args:
 
     """
-    banner = ' Simulation campaign summary'
-    print('\n', '=' * len(banner), '\n{}\n'.format(banner), '=' * len(banner))
-    print("\n Scenarios to simulate [scenario]: {0}"
+    iter_var = [len(iteration_variables_dictionary[k][0]) for k in iteration_variables_dictionary.keys()]
+    banner = ' Campaign Info'
+    print('\n{}\n'.format(banner), '-' * len(banner))
+    print("\n Scenarios to simulate: {0}"
           "\n Iteration variables: {1} = {2}"
           "\n Repetitions per scenario: {3}"
           "\n Simulation time: {4}s"
-          "\n Total Runs: {5} \n\n".format(scenarios_to_sim, len(list(iteration_variables_dictionary.keys())), list(iteration_variables_dictionary.values()), repetitions,
+          "\n Total Runs: {5}".format(scenarios_to_sim, len(list(iteration_variables_dictionary.keys())), iter_var, repetitions,
                                            simtime, total_sims))
+    print('-' * len(banner),'\n')
 
 
-def buid_campaign():
+def run_simulations():
     try:
-        s_build_campaign = str(input(' Build simulation campaign (*Y/N): '))
+        s_build_campaign = str(input(' Run simulations (*Y/N): '))
     except:
         print('Wrong input!')
         return False
@@ -154,7 +156,7 @@ def buid_campaign():
 
 
 def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, repetitions, sim_scenarios_list,
-                              variables_path, inifile, analyze, makefile, verbose):
+                              variables_path, inifile, analyze, makefile, verbose, NED_files_dir):
     """
      Execute parallel simulations of simulation campaign elements. If there is not enough processors,
      a bath is used for queue simulations and distribute among processors.
@@ -189,7 +191,7 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
 
     else:
 
-        if buid_campaign():
+        if run_simulations():
             # create temp ini file for the simulation campaign
             temp_ini_name = create_temp_ini_file(output_dir, repetitions, inifile, iteration_variables_dictionary)
 
@@ -204,7 +206,7 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
                 batch = math.ceil(b)
 
             # execute parallel simulations
-            parallel(max_processors, omnet_path, batch, sim_time, runs_set_dictionary, temp_ini_name, sim_scenarios_list, makefile, verbose)
+            parallel(max_processors, omnet_path, batch, sim_time, runs_set_dictionary, temp_ini_name, sim_scenarios_list, makefile, verbose, NED_files_dir)
 
 
 def missing_files(total_sims, output_dir):
@@ -224,7 +226,7 @@ def missing_files(total_sims, output_dir):
 
 
 def parallel(max_processors, omnet_path, batch, sim_time, runs_bundle, temp_ini_name, sim_scenarios_list,
-             makefile, verbose):
+             makefile, verbose, NED_files_dir):
     """
     Execute parallel summary. If the number of cpus < # of summary a batch of runs is set
 
@@ -242,7 +244,7 @@ def parallel(max_processors, omnet_path, batch, sim_time, runs_bundle, temp_ini_
 
     # Parallelize simulations
     with parallel_backend("loky"):
-        Parallel(n_jobs=max_processors, verbose=10)(delayed(execute_sim)(makefile, max_processors, omnet_path, k, batch, sim_time, runs_bundle[k], temp_ini_name, verbose) for k in sim_scenarios_list)
+        Parallel(n_jobs=max_processors, verbose=10)(delayed(execute_sim)(makefile, max_processors, omnet_path, k, batch, sim_time, runs_bundle[k], temp_ini_name, verbose, NED_files_dir) for k in sim_scenarios_list)
 
 
 def new_folder(new_directory):
@@ -267,7 +269,7 @@ def folder_permissions(veins_exec_project_path):
 
 
 def execute_sim(veins_exec_project_path, max_processors, omnet_path, scenario, batch, sim_time, runs, temp_ini_name,
-                verbose):
+                verbose, NED_files_dir):
     """
     Execute scenario simulation using OMNET++ funcionality (opp_run all OMNET++ simulation manual  11.20 Running Simulation Campaigns)
 
@@ -293,13 +295,14 @@ def execute_sim(veins_exec_project_path, max_processors, omnet_path, scenario, b
 
     if isNotBlank(scenario):
         cmd = '{0}opp_runall -j{1} -b{2} {3} -u Cmdenv -c {4} -r {5} ' \
-              '-n .:../../src/veins ' \
+              '-n {6} ' \
               '--cmdenv-performance-display=false ' \
-              '--sim-time-limit={6}s ' \
+              '--sim-time-limit={7}s ' \
               '--cmdenv-redirect-output=true ' \
               '--cmdenv-express-mode=true ' \
-              '{7}'.format(omnet_path, max_processors, batch, veins_exec_project_path, scenario, runs,
+              '{8}'.format(omnet_path, max_processors, batch, veins_exec_project_path, scenario, runs, NED_files_dir,
                            sim_time, temp_ini_name)
+        print(cmd)
         # Execute command
         if verbose:
             os.system(cmd)
