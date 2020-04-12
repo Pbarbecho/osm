@@ -21,7 +21,7 @@ OSM tool includes the following tool:
   $osm launcher [OPTIONS] INIFILE MAKEFILE
 
   # Summarize result files located in output folder
-  $osm parser [OPTIONS] 
+  $osm summarizer [OPTIONS] 
 
   # Analyze summarized file 
   $osm analyzer [OPTIONS] 

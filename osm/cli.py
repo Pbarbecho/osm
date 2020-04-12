@@ -109,7 +109,7 @@ def get_omnetpp_installation_path(app):
     r = subprocess.getoutput('{0} {1}'.format(command, app))
     app_instance = (r.strip('omnetpp:').strip()).split(' ')
     if len(app_instance) > 1:
-        click.echo('\n More than one OMNET installation found !!!')
+        click.echo('\n {} OMNET++ installations found !!!'.format(len(app_instance)))
         # TO DO menu to select OMNet++ instance
         return app_instance[1].strip('omnetpp')  # default first installation instance
     else:
