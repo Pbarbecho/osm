@@ -57,7 +57,7 @@ def cli(config, v):
               help='Analyze a group of files from a previous simulation campaign, looking for missing files.')
 @click.option('-add', '--additional-files-path',
               type=click.Path(exists=True, resolve_path=True),
-              help='Path to iteration varibles and structure files. [default: parents directory]')
+              help='Path to parameters studied file (variables.txt.csv) and structure file (structure.csv) files. [default: parents directory]')
 @click.argument('inifile',  # path to veins ini file project
                 type=click.Path(exists=True, resolve_path=True))
 @click.argument('makefile',  # path to veins executable project
@@ -111,7 +111,7 @@ def get_omnetpp_installation_path(app):
     if len(app_instance) > 1:
         click.echo('\n {} OMNET++ installations found !!!'.format(len(app_instance)))
         # TO DO menu to select OMNet++ instance
-        return app_instance[1].strip('omnetpp')  # default first installation instance
+        return app_instance[2].strip('omnetpp')  # default first installation instance
     else:
         return app_instance.strip('omnetpp')
 
@@ -136,7 +136,7 @@ def get_omnetpp_installation_path(app):
               help="Filename with supported extension .npy (Numpy), .mat (Matlab) or csv (Comma-separated values).")
 @click.option('-add', '--additional-files-path',
               type=click.Path(exists=True, resolve_path=True),
-              help='Path to iteration varibles and structure files. [default: parents directory]')
+              help='Path to iteration varibles and structure.csv files. [default: parents directory]')
 @pass_config
 def summarizer(config, max_processes, input_dir, output_dir, output_filename, additional_files_path):
     """

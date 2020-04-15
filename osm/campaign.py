@@ -8,10 +8,10 @@ import subprocess
 
 def run(output_dir, max_processors, omnet_path, sim_time, repetitions, analyze, iter_path, inifile, makefile, verbose, NED_files_dir):
     """
-    Return the results relative to the desired parameter space in the form of an xarray data structure.
+    Return the results relative to the desired parameter space in the form of an xarray data structure.csv.
 
     Args:
-    output_dir: (path) The space of structure to export.
+    output_dir: (path) The space of structure.csv to export.
     max_processors: (int) The max number of cpus to use. By default, all cpus are used.
     omnet_path: (path) Path to the OMNET++ installation.
     By default the script try to find the installation path.
@@ -48,7 +48,7 @@ def get_scenarios(veins_ini_file):
     """
      Try to read simulation scenarios in VEINs project .ini file
 
-     OMNET++ defines [Config ] as the structure in ini file to declare an scenario.
+     OMNET++ defines [Config ] as the structure.csv in ini file to declare an scenario.
      This function return a list with [Config ] declarations found in ini file.
 
     """
@@ -66,7 +66,7 @@ def get_scenarios(veins_ini_file):
 
 def read_iteration_variables_from_file(scenarios_to_sim, iter_parameters_file_path):
     """
-    Get the number of iteration structure (defined as specified in OMNET++ Simulation manual 10.4 Parameter Studies)
+    Get the number of iteration structure.csv (defined as specified in OMNET++ Simulation manual 10.4 Parameter Studies)
     of each scenario (sim_scenarios) defined in .ini file.
 
     e.g. OMNET++ study parameter definition -> *.numHosts = ${1, 2, 5, 10..50 step 10}
@@ -84,7 +84,7 @@ def read_iteration_variables_from_file(scenarios_to_sim, iter_parameters_file_pa
     dic_iter_vars = {}
     dic_scenario_iter_vars = {}
 
-    iter_parameters_file_path = os.path.join(iter_parameters_file_path, 'variables')
+    iter_parameters_file_path = os.path.join(iter_parameters_file_path, 'variables.txt')
 
     for s in scenarios_to_sim:
         with open(iter_parameters_file_path, 'r') as ini_file:
@@ -106,11 +106,12 @@ def scenario_runs_set(scenario_iteration_variables_dictionary, repetitions):
      for create batches e.g. -r 0,1,2,3.
 
      Args:
-        scenario_iteration_variables_dictionary (dict): Dictionary with scenarios as keys and the number of iteration variables as values
+        scenario_iteration_variables_dictionary (dict): Dictionary with scenarios as keys and the number of iteration variables.txt as values
         repetitions (int): The number of runs for each iteration parameter.
 
     """
-    runs_dic = {}
+    runs_dic_command = {}
+    runs_dic_compute = {}
     simulations_count = 0
 
     for scenario in scenario_iteration_variables_dictionary:
@@ -118,9 +119,12 @@ def scenario_runs_set(scenario_iteration_variables_dictionary, repetitions):
         scenario_runs = np.prod(values_list) * repetitions
         simulations_count += scenario_runs
         runs_range = list(range(int(scenario_runs)))
-        runs_dic[scenario] = str(runs_range).strip('[]').replace(" ", "")
+        # compute
+        runs_dic_compute[scenario] = runs_range
+        # opp_runall syntax
+        runs_dic_command[scenario] = str(runs_range).strip('[]').replace(" ", "")
     total_simulations = scenario_runs * len(scenario_iteration_variables_dictionary)
-    return total_simulations, runs_dic
+    return total_simulations, runs_dic_command, runs_dic_compute
 
 
 def sim_campaign_info(scenarios_to_sim, iteration_variables_dictionary, repetitions, simtime, total_sims):
@@ -134,12 +138,12 @@ def sim_campaign_info(scenarios_to_sim, iteration_variables_dictionary, repetiti
     banner = ' Campaign Info'
     print('\n{}\n'.format(banner), '-' * len(banner))
     print("\n Scenarios to simulate: {0}"
-          "\n Iteration variables: {1} = {2}"
+          "\n Iteration variables.txt: {1} = {2}"
           "\n Repetitions per scenario: {3}"
           "\n Simulation time: {4}s"
           "\n Total Runs: {5}".format(scenarios_to_sim, len(list(iteration_variables_dictionary.keys())), iter_var, repetitions,
                                            simtime, total_sims))
-    print('-' * len(banner), '\n')
+    print('', '-' * len(banner), '\n')
 
 
 def run_simulations():
@@ -164,7 +168,7 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
      Args:
 
     @param max_processors: (int) The max number of cpus to use. By default, all cpus are used.
-    @param output_dir: (path) The space of structure to export.
+    @param output_dir: (path) The space of structure.csv to export.
     @param omnet_path: (path) The OMNET++ installation path
     @param sim_time: (int) The simulation time. Common for all scenarios.
     @param repetitions: (int) The number of runs for each iteration parameter.
@@ -179,8 +183,8 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
         sim_scenarios_list, variables_path)
 
     # Total number of runs = scenarios * iter variable * repetitions_per_scenario
-    # return -r 0,1,2,3,4 parameter per scenario according to iter variables
-    total_sims, runs_set_dictionary = scenario_runs_set(scenario_iteration_variables_dictionary, repetitions)
+    # return -r 0,1,2,3,4 parameter per scenario according to iter variables.txt
+    total_sims, runs_dic_command, runs_dic_compute = scenario_runs_set(scenario_iteration_variables_dictionary, repetitions)
 
     # simulation campaign information
     sim_campaign_info(sim_scenarios_list, iteration_variables_dictionary, repetitions, sim_time, total_sims)
@@ -202,18 +206,31 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
                 batch = 1  # default when b <= 1 enough cpus
 
             else:
-                b = total_sims / max_processors
-                batch = math.ceil(b)
-
+                #b = total_sims / max_processors
+                #batch = math.ceil(b)
+                batch = allocate_processors(runs_dic_compute, max_processors)
             # execute parallel simulations
-            parallel(max_processors, omnet_path, batch, sim_time, runs_set_dictionary, temp_ini_name, sim_scenarios_list, makefile, verbose, NED_files_dir)
+            parallel(max_processors, omnet_path, batch, sim_time, runs_dic_command, temp_ini_name, sim_scenarios_list, makefile, verbose, NED_files_dir)
+
+
+def allocate_processors(df_scenarios, Processors):
+    len_scenarios = []
+    processors_per_scenario_tmp = []
+
+    [len_scenarios.append(len(df_scenarios[s])) for s in df_scenarios]
+    processors_per_scenario = (np.true_divide(len_scenarios, sum(len_scenarios))) * Processors
+
+    [processors_per_scenario_tmp.append(1 if s < 1 else np.math.floor(s)) for s in processors_per_scenario]
+    batch_per_scenario = np.ceil(np.divide(len_scenarios, processors_per_scenario_tmp))
+    #np.repeat(batch_per_scenario, processors_per_scenario_tmp)
+    return batch_per_scenario
 
 
 def missing_files(total_sims, output_dir):
     """
     Check in results folder if there are missing files of simulation campaign
     @param total_sims: (int) Total number of runs = scenarios * iter variable * repetitions_per_scenario
-    @param output_dir: (path) The space of structure to export.
+    @param output_dir: (path) The space of structure.csv to export.
     @return:
     """
 
@@ -243,8 +260,9 @@ def parallel(max_processors, omnet_path, batch, sim_time, runs_bundle, temp_ini_
     """
 
     # Parallelize simulations
+
     with parallel_backend("loky"):
-        Parallel(n_jobs=max_processors, verbose=10)(delayed(execute_sim)(makefile, max_processors, omnet_path, k, batch, sim_time, runs_bundle[k], temp_ini_name, verbose, NED_files_dir) for k in sim_scenarios_list)
+        Parallel(n_jobs=max_processors, verbose=10)(delayed(execute_sim)(makefile, max_processors, omnet_path, k, int(batch[i]), sim_time, runs_bundle[k], temp_ini_name, verbose, NED_files_dir) for i, k in enumerate(sim_scenarios_list))
 
 
 def new_folder(new_directory):
@@ -292,7 +310,6 @@ def execute_sim(veins_exec_project_path, max_processors, omnet_path, scenario, b
 
     # Allow executions and file creation in simulations paths
     folder_permissions(veins_exec_project_path)
-
     if isNotBlank(scenario):
         cmd = '{0}opp_runall -j{1} -b{2} {3} -u Cmdenv -c {4} -r {5} ' \
               '-n {6} ' \
@@ -339,7 +356,7 @@ def create_temp_ini_file(output_results, repetitions, veins_ini_file_name, itera
      Instantiates a temp.ini file with simulation campaign configurations.
 
      Args:
-          output_results (path): The space of structure to export.
+          output_results (path): The space of structure.csv to export.
           repetitions (int): The number of runs for each iteration parameter.
           veins_ini_file_name (path): Path to .ini file of veins project.
 
@@ -376,7 +393,7 @@ def create_temp_ini_file(output_results, repetitions, veins_ini_file_name, itera
 
 def add_iteration_variables_to_scenarions_ini_file(temp_ini_file, iteration_variables_dictionary):
     """
-    Scenarios with same iteration variables
+    Scenarios with same iteration variables.txt
 
     """
     for iteration_variable in iteration_variables_dictionary:
