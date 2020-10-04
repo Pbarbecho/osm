@@ -5,6 +5,8 @@ from osm.campaign import new_folder
 from osm.default_summarizer import parse_if_number
 import pivottablejs as pj
 import seaborn as sns
+#plotstyle
+sns.set_style('darkgrid', {'axes.edgecolor':'1'})
 
 
 def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table):
@@ -27,6 +29,9 @@ def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table):
     new_folder(output_directory)
     df = pd.read_csv(input_csv_file)
 
+    # Change column names
+    df = df.rename(columns={'accidentDuration':'Accident_duration','beaconInterval':'Beacon_interval(s)'})
+
     if custom_pivot_table:
         pj.pivot_ui(df)
         cmd = 'firefox pivottablejs.html'
@@ -35,13 +40,12 @@ def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table):
 
     else:
         # Examples of custom analyze functions
-        node_speed(df, output_directory)
+        #node_speed(df, output_directory)
         packet_losses(df, output_directory)
 
         # Print outputs
         print('\nFiles generated: ')
         [print(' {}) {}'.format(i, file)) for i, file in enumerate(os.listdir(output_directory))]
-
 
 
 def packet_losses(tmp, output_directory):
@@ -64,8 +68,8 @@ def packet_losses(tmp, output_directory):
 
     # new dataframe for PL
     pl_df = pd.DataFrame()
-    pl_df['tx'] = tmp_tx.groupby(['scenario', 'accidentDuration', 'beaconInterval', 'repetition'])['MsgId'].count()
-    pl_df['rx'] = tmp_rx.groupby(['scenario', 'accidentDuration', 'beaconInterval', 'repetition'])['MsgId'].count()
+    pl_df['tx'] = tmp_tx.groupby(['scenario', 'Accident_duration', 'Beacon_interval(s)', 'repetition'])['MsgId'].count()
+    pl_df['rx'] = tmp_rx.groupby(['scenario', 'Accident_duration', 'Beacon_interval(s)', 'repetition'])['MsgId'].count()
 
     # Compute packet losses
     pl_df['%PL'] = (1 - (pl_df.rx / pl_df.tx)) * 100
@@ -75,8 +79,9 @@ def packet_losses(tmp, output_directory):
     pl_df.to_csv(os.path.join(output_directory, '{}.csv'.format(filename)), header=True)
 
     # Plot
-    fig = sns.catplot(x='beaconInterval', y='%PL', kind='box', sym='', hue='accidentDuration', col='scenario',
+    fig = sns.catplot(x='Beacon_interval(s)', y='%PL', kind='box', sharex=False, sharey=False, hue='Accident_duration', col='scenario',
                       legend=True, legend_out=True, data=pl_df)
+    fig.despine(top=False, right=False)
     fig.set_axis_labels('Beacon interval  (s)', '%  packet losses')
     plt.savefig(os.path.join(output_directory, filename), bbox_inches="tight")
 

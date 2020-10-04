@@ -196,6 +196,10 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
     else:
 
         if run_simulations():
+            # script memory
+            program = '/root/cpu_mem.sh'
+            subprocess.Popen(program)
+
             # create temp ini file for the simulation campaign
             temp_ini_name = create_temp_ini_file(output_dir, repetitions, inifile, iteration_variables_dictionary)
 
@@ -258,11 +262,9 @@ def parallel(max_processors, omnet_path, batch, sim_time, runs_bundle, temp_ini_
     @param makefile: (path) Path to executable veins project.
     @return:
     """
-
     # Parallelize simulations
-
     with parallel_backend("loky"):
-        Parallel(n_jobs=max_processors, verbose=10)(delayed(execute_sim)(makefile, max_processors, omnet_path, k, int(batch[i]), sim_time, runs_bundle[k], temp_ini_name, verbose, NED_files_dir) for i, k in enumerate(sim_scenarios_list))
+        Parallel(n_jobs=max_processors, verbose=10)(delayed(execute_sim)(makefile, max_processors, omnet_path, k, 1 if isinstance(batch, int) else int(batch[i]), sim_time, runs_bundle[k], temp_ini_name, verbose, NED_files_dir) for i, k in enumerate(sim_scenarios_list))
 
 
 def new_folder(new_directory):

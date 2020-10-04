@@ -23,10 +23,12 @@ def wrapper_scavetool(input_files_directory, output_directory, output_filename):
     command = 'whereis' if os.name != 'nt' else 'which'
     r = subprocess.getoutput('{0} {1}'.format(command, 'scavetool'))
     app_instance = (r.strip('scavetool:').strip()).split(' ')
-    path = app_instance[0]  # TO DO in case more than one OMNET installation is found
+    path = app_instance[1]  # TO DO in case more than one OMNET installation is found
 
     # Execute scavetool
-    cmd = '{} x *.sca *.vec -o {}'.format(path, output_cvs_file)
+
+    cmd = '{}scavetool x -v *.sca *.vec -o {}'.format(path, output_cvs_file)
+    print(cmd)
     os.system(cmd)
 
 
