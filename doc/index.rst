@@ -25,8 +25,8 @@ How to cite us
 
 If you use SMO for your OMNeT++ experiment analysis, we would appreciate a citation of our work:
 
-* Pablo Barbecho, **'Automating large-scale simulations for OMNeT++'**, 2020. (Documentation) https://osm.readthedocs.io
-* Pablo Barbecho, **'Automating large-scale simulations for OMNeT++'**, 2020. (Github repository) https://github.com/Pbarbecho/osm
+* P. Bautista, L. F. Urquiza-Aguiar, L. L. Cárdenas and M. A. Igartua, “Large-Scale Simulations Manager Tool for OMNeT++: Expediting Simulations and Post-Processing Analysis,” in IEEE Access, vol. 8, pp. 159291-159306, 2020, doi: 10.1109/ACCESS.2020.3020745.
+
 
 Feature highlights
 ------------------
