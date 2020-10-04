@@ -8,8 +8,26 @@ OSM allows to OMNeT++ users to quickly and easily execute large-scale network si
 This is an automation tool for OMNeT++ large-scale simulations and data analysis.
 Based on OMNeT++ structure, this tool reads .ini file and build simulation campaign.
 Users' manual an code documentation is available at [readthedocs][rtd].
+ 
+How to cite us 
+--------------
 
-OSM tool includes the following tool:    
+If you use SMO for your OMNeT++ experiment analysis, we would appreciate a citation of our work:
+
+* P. Bautista, L. F. Urquiza-Aguiar, L. L. Cárdenas and M. A. Igartua, “Large-Scale Simulations Manager Tool for OMNeT++: Expediting Simulations and Post-Processing Analysis,” in IEEE Access, vol. 8, pp. 159291-159306, 2020, doi: 10.1109/ACCESS.2020.3020745.
+
+
+Feature highlights 
+------------------
+
+* Supports Python >= 3.5;
+* Fine grane control of the simulation campaign;
+* Customizable/interactive plotting
+* Runs parallelized simulations and post-processing for large number of files (common in large-scale simulations);
+
+
+
+OSM includes the following tool:    
 ```bash
   - Launcher: build simulation campaign and execute parallel simulations in batches.
   - Parser:   Automatically try to detect output results files from simulation campaign (.vec,.sca, custom format) and convert those to an unique output file. 
