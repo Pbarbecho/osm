@@ -1,5 +1,4 @@
-import math
-import os
+import os, sys
 import shutil
 import numpy as np
 from joblib import Parallel, delayed, parallel_backend
@@ -413,18 +412,23 @@ def ask_for_scenarios_to_simulate(sim_scenarios_list):
     @param sim_scenarios_list:
     @return:
     """
+    # TO DO REPEATED INPUTs
     try:
-        scenarios_to_simulate = list(input('\n Select scenarios to simulate (e.g. 1,5,2  default=all): '))
-        # TO DO CHECK VALID SCENARIOS
-    except:
-        print('Wrong input!. Default value [all]')
-    else:
-        if not scenarios_to_simulate:
-            selected_scenarios_list = sim_scenarios_list
+        input_scenarios = input('\n Select the scenario number to simulate separated by space (e.g. 1 5 20): ')
+        scenarios_sim_list = input_scenarios.split()
+        scenarios_to_simulate = list(map(int, scenarios_sim_list))
+        sim_list = list(range(len(sim_scenarios_list)))
+        if scenarios_to_simulate:
+            for s in scenarios_to_simulate:
+                if s not in sim_list:
+                    print('\n Scenario {} not in simulation list'.format(s))
+                    sys.exit(os.EX_SOFTWARE)
         else:
-            if len(scenarios_to_simulate) > 1:
-                scenarios_to_simulate.remove(',')
+            sys.exit(os.EX_SOFTWARE)
+    except:
+        print('\n !!! Wrong input !!!\n')
+        sys.exit(os.EX_SOFTWARE)
+    else:
+        return [sim_scenarios_list[i] for i in scenarios_to_simulate]
 
-            selected_scenarios_list = [sim_scenarios_list[i] for i in list(map(int, scenarios_to_simulate))]
-    return selected_scenarios_list
 
