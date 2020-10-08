@@ -113,7 +113,7 @@ def get_omnetpp_installation_path(app):
         # TO DO menu to select OMNet++ instance
         return app_instance[2].strip('omnetpp')  # default first installation instance
     else:
-        return app_instance.strip('omnetpp')
+        return app_instance[0].strip('omnetpp')
 
 
 ##########
