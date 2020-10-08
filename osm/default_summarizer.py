@@ -185,9 +185,9 @@ def build_results_df(input_files_directory, filename, structure, iteration_param
         tx_df = df_results[df_results.TR == 'tx']
         tx_df = tx_df[tx_df.NodeID == 0]
         x = tx_df[tx_df.MsgTime <= 214].x
-        x = x.astype('float64', raise_on_error=False)
+        x = x.astype('float64')
         y = tx_df[tx_df.MsgTime <= 214].y
-        y = y.astype('float64', raise_on_error=False)
+        y = y.astype('float64')
         # max distance of rx message
         df_results = df_results[df_results.TR == 'rx']
         df_results['Distance'] = ((x - df_results.x)**2 + (y - df_results.y)**2)**(1/2)
