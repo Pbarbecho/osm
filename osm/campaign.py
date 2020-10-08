@@ -196,8 +196,8 @@ def build_simulation_campaign(max_processors, output_dir, omnet_path, sim_time, 
 
         if run_simulations():
             # script memory
-            program = '/root/cpu_mem.sh'
-            subprocess.Popen(program)
+            #program = '/root/cpu_mem.sh'
+            #subprocess.Popen(program)
 
             # create temp ini file for the simulation campaign
             temp_ini_name = create_temp_ini_file(output_dir, repetitions, inifile, iteration_variables_dictionary)
