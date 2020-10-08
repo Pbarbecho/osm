@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys
 import subprocess
 import numpy as np
 import pandas as pd
@@ -100,13 +99,15 @@ def get_iteration_parameters(variables_path):
     return iter_vararibles_list
 
 
-def build_results_df(input_files_directory, filename, structure, iteration_parameters_list):
-    """
+"""
 
-    Build dataframes from result files.
-    In case of numeric types, dataframes are constructed accordingly
-    Additional columns are add (filename, scenario, repetition) from the file name for grouping purposes.
-    """
+def build_results_df(input_files_directory, filename, structure, iteration_parameters_list):
+    
+
+    #Build dataframes from result files.
+    #In case of numeric types, dataframes are constructed accordingly
+    #Additional columns are add (filename, scenario, repetition) from the file name for grouping purposes.
+    
 
     iteration_parameters_list = iteration_parameters_list[::-1]
     # read data and build a dataframe
@@ -140,6 +141,70 @@ def build_results_df(input_files_directory, filename, structure, iteration_param
     else:
         print('Number of structure.csv must be equal to structure.csv in results files!!!')
         sys.exit()
+"""
+
+
+def build_results_df(input_files_directory, filename, structure, iteration_parameters_list):
+
+    #Build dataframes from result files.
+    #In case of numeric types, dataframes are constructed accordingly
+    #Additional columns are add (filename, scenario, repetition) from the file name for grouping purposes.
+
+    iteration_parameters_list = iteration_parameters_list[::-1]
+    # read data and build a dataframe
+    with open(os.path.join(input_files_directory, filename), 'r') as file:
+        value = [line.strip().split(',') for line in file]
+    values = np.array(value)
+
+    if len(values[0]) == len(structure):
+        # build dataframe from result file and structure.csv file (contains the columns names)
+        df_results = pd.DataFrame(values, columns=structure)
+        # assign numeric type to columns
+        for column in df_results.columns:
+            # try to convert to numeric if first value is numeric
+            if type(parse_if_number(df_results[column].iloc[0])) == float:
+                df_results[column] = pd.to_numeric(df_results[column], errors='coerce')
+
+        # insert columns with filename, scenario and repetitions per execution
+        name_components = filename.split(',')
+
+        df_results.insert(0, 'name', filename)
+
+        for i, component in enumerate(name_components):
+            component = component.strip('-')
+            component = component.strip('.csv')
+
+            if i == 0:
+                df_results.insert(i + 1, 'scenario', component)
+            if i >= 1:
+                if i + 1 == len(name_components):
+                    df_results.insert(i + 1, 'repetition', component)
+                else:
+                    df_results.insert(i + 1, '{}'.format(iteration_parameters_list[i-1]), np.int(component))
+        # Add column with distance
+        tx_df = df_results[df_results.TR == 'tx']
+        tx_df = tx_df[tx_df.NodeID == 0]
+        x = tx_df[tx_df.MsgTime <= 214].x
+        x = x.astype('float64', raise_on_error=False)
+        y = tx_df[tx_df.MsgTime <= 214].y
+        y = y.astype('float64', raise_on_error=False)
+        # max distance of rx message
+        df_results = df_results[df_results.TR == 'rx']
+        df_results['Distance'] = ((x - df_results.x)**2 + (y - df_results.y)**2)**(1/2)
+
+        if not df_results.empty:
+            maximumdist = max(df_results['Distance'])
+            #rx_df['MaxDistance'] = maximumdist
+        else:
+            maximumdist = 0
+        df_results.insert(1, 'MaxDistance', maximumdist)
+
+        # number of nodes
+        df_results.drop_duplicates(subset='NodeID', keep="last", inplace=True)
+        num_nodes = int(df_results.NodeID.count())
+        #rx_df['NumNodes'] = num_nodes
+        df_results.insert(2, 'NumberNodes', num_nodes)
+        return df_results
 
 
 def parse_if_number(s):

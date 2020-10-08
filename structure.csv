@@ -1,1 +1,1 @@
-Type,NodeID,tx/rx,recAddress,Speed,MsgId,Length,CH,Time
+Type,NodeID,TR,recAddress,x,y,MsgId,CH,MsgTime
