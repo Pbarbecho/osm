@@ -98,9 +98,7 @@ def get_iteration_parameters(variables_path):
                 iter_vararibles_list.append(iter_vararible[-1])
     return iter_vararibles_list
 
-
 """
-
 def build_results_df(input_files_directory, filename, structure, iteration_parameters_list):
     
 
@@ -109,7 +107,7 @@ def build_results_df(input_files_directory, filename, structure, iteration_param
     #Additional columns are add (filename, scenario, repetition) from the file name for grouping purposes.
     
 
-    iteration_parameters_list = iteration_parameters_list[::-1]
+    #iteration_parameters_list = iteration_parameters_list[::-1]
     # read data and build a dataframe
     with open(os.path.join(input_files_directory, filename), 'r') as file:
         value = [line.strip().split(',') for line in file]
@@ -129,18 +127,21 @@ def build_results_df(input_files_directory, filename, structure, iteration_param
         df_results.insert(0, 'name', filename)
 
         for i, component in enumerate(name_components):
+           
             if i == 0:
                 df_results.insert(i + 1, 'scenario', component)
             if i >= 1:
                 if i + 1 == len(name_components):
                     df_results.insert(i + 1, 'repetition', component)
                 else:
+                    print(iteration_parameters_list)
                     df_results.insert(i + 1, '{}'.format(iteration_parameters_list[i-1]), component)
         return df_results
 
     else:
         print('Number of structure.csv must be equal to structure.csv in results files!!!')
         sys.exit()
+
 """
 
 
@@ -181,12 +182,13 @@ def build_results_df(input_files_directory, filename, structure, iteration_param
                     df_results.insert(i + 1, 'repetition', component)
                 else:
                     df_results.insert(i + 1, '{}'.format(iteration_parameters_list[i-1]), np.int(component))
-        # Add column with distance
+
+        # Add column with distance from accidented node QSN
         tx_df = df_results[df_results.TR == 'tx']
         tx_df = tx_df[tx_df.NodeID == 0]
-        x = tx_df[tx_df.MsgTime <= 214].x
+        x = tx_df[tx_df.MsgTime <=1000].x
         x = x.astype('float64')
-        y = tx_df[tx_df.MsgTime <= 214].y
+        y = tx_df[tx_df.MsgTime <= 1000].y
         y = y.astype('float64')
         # max distance of rx message
         df_results = df_results[df_results.TR == 'rx']

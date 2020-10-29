@@ -1,1 +1,1 @@
-*.connectionManager.maxInterfDist = {10, 100, 300}m
+*.*.appl.NumberofVehicles = {200}
