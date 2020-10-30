@@ -64,7 +64,7 @@ def merge_files(input_files_directory, output_directory, output_filename, additi
     else:
 
         # Read iteration parameter to insert in file structure.csv
-        iteration_parameters_list = get_iteration_parameters(variables_path)
+        iteration_parameters_dic = get_iteration_parameters(variables_path)
 
         # Read structure.csv
         e_parameters = get_parameters(structure_file_path)
@@ -76,7 +76,7 @@ def merge_files(input_files_directory, output_directory, output_filename, additi
         #results_df = results_df.append([build_results_df(input_files_directory, file, e_parameters, iteration_parameters_list) for file in result_files])
 
         with parallel_backend("loky"):
-            total_results_df = total_results_df.append(Parallel(n_jobs=max_processes, verbose=1)(delayed(build_results_df)(input_files_directory, file, e_parameters, iteration_parameters_list) for file in result_files))
+            total_results_df = total_results_df.append(Parallel(n_jobs=max_processes, verbose=1)(delayed(build_results_df)(input_files_directory, file, e_parameters, iteration_parameters_dic) for file in result_files))
         save_simulation_results(total_results_df, output_directory, output_filename)
         print("Output file '{}' generated from {} result files\n".format(output_filename, len(result_files)))
 
@@ -87,126 +87,79 @@ def get_iteration_parameters(variables_path):
     Read iteration parameters from file as part of the structure.csv
 
     """
-
     with open(variables_path, 'r') as ini_file:
         # iteration variables.txt
-        iter_vararibles_list = []
+        iter_variables_dic = {}
         for line in ini_file:
             if isNotBlank(line):
-                iter_vararible, value = line.split('=')
+                iter_vararible, values = line.strip().split('=')
+                # get array of values
+                values = values.replace('{', '').replace('}', '').replace('s', '').replace(" ", "")
+                values = values.split(',')
                 iter_vararible = iter_vararible.strip().split('.')
-                iter_vararibles_list.append(iter_vararible[-1])
-    return iter_vararibles_list
+                iter_variables_dic[iter_vararible[-1]] = values
+    return iter_variables_dic
 
-"""
-def build_results_df(input_files_directory, filename, structure, iteration_parameters_list):
-    
+
+def add_basic_columns(summarized_df, parameters_dic, filename):
+    # Insert columns with scenario, variables and repetitions per execution
+    name_components = filename.split(',')
+    # Column 0 filename
+    summarized_df.insert(0, 'name', filename)
+    # Column 1 scenario
+    summarized_df.insert(1, 'scenario', name_components[0])
+    # Column 2 repetitions
+    summarized_df.insert(2, 'repetition', name_components[-1])
+    # Match and add parameters columns
+    for elem, eval_variable in enumerate(name_components[1:-1]):
+        for param in parameters_dic:
+            parameter_values = parameters_dic[param]
+            if eval_variable.strip('-') in parameter_values:
+                column_name = param
+                break
+        summarized_df.insert(elem + 3, '{}'.format(column_name), np.int(eval_variable.strip('-')))
+    return summarized_df
+
+
+def build_results_df(input_files_directory, filename, structure, iteration_parameters_dic):
 
     #Build dataframes from result files.
     #In case of numeric types, dataframes are constructed accordingly
     #Additional columns are add (filename, scenario, repetition) from the file name for grouping purposes.
-    
 
-    #iteration_parameters_list = iteration_parameters_list[::-1]
     # read data and build a dataframe
     with open(os.path.join(input_files_directory, filename), 'r') as file:
         value = [line.strip().split(',') for line in file]
     values = np.array(value)
 
+    # check results and structure number of elements
     if len(values[0]) == len(structure):
         # build dataframe from result file and structure.csv file (contains the columns names)
         df_results = pd.DataFrame(values, columns=structure)
         # assign numeric type to columns
         for column in df_results.columns:
-            # try to convert to numeric if first value is numeric
+            # try to convert to numeric if first row value is numeric
             if type(parse_if_number(df_results[column].iloc[0])) == float:
                 df_results[column] = pd.to_numeric(df_results[column], errors='coerce')
 
-        # insert columns with filename, scenario and repetitions per execution
-        name_components = filename.split(',')
-        df_results.insert(0, 'name', filename)
-
-        for i, component in enumerate(name_components):
-           
-            if i == 0:
-                df_results.insert(i + 1, 'scenario', component)
-            if i >= 1:
-                if i + 1 == len(name_components):
-                    df_results.insert(i + 1, 'repetition', component)
-                else:
-                    print(iteration_parameters_list)
-                    df_results.insert(i + 1, '{}'.format(iteration_parameters_list[i-1]), component)
-        return df_results
-
+        # Add new columns [scenario, repetitions, evaluations variables]
+        summarized_df = add_basic_columns(df_results, iteration_parameters_dic, filename)
+        # Add USER custom  columns
+        customized_df = add_user_custom_columns(summarized_df)
+        return customized_df
     else:
-        print('Number of structure.csv must be equal to structure.csv in results files!!!')
-        sys.exit()
-
-"""
+        sys.exit("variables.txt file and structure.txt do not has the same number of elements")
 
 
-def build_results_df(input_files_directory, filename, structure, iteration_parameters_list):
+def add_user_custom_columns(default_df):
+    # Add column with distance from accident node position to rx node QSN
+    tx_nodes = default_df[default_df.TR == 'tx']
+    accident_node = tx_nodes[tx_nodes.NodeID == 0]
+    acc_x, acc_y = accident_node.at[0, 'x'], accident_node.at[0, 'y']
+    # Euclidean distance
+    default_df['DistanceToAccident'] = ((acc_x - default_df.x) ** 2 + (acc_y - default_df.y) ** 2) ** (1 / 2)
 
-    #Build dataframes from result files.
-    #In case of numeric types, dataframes are constructed accordingly
-    #Additional columns are add (filename, scenario, repetition) from the file name for grouping purposes.
-
-    iteration_parameters_list = iteration_parameters_list[::-1]
-    # read data and build a dataframe
-    with open(os.path.join(input_files_directory, filename), 'r') as file:
-        value = [line.strip().split(',') for line in file]
-    values = np.array(value)
-
-    if len(values[0]) == len(structure):
-        # build dataframe from result file and structure.csv file (contains the columns names)
-        df_results = pd.DataFrame(values, columns=structure)
-        # assign numeric type to columns
-        for column in df_results.columns:
-            # try to convert to numeric if first value is numeric
-            if type(parse_if_number(df_results[column].iloc[0])) == float:
-                df_results[column] = pd.to_numeric(df_results[column], errors='coerce')
-
-        # insert columns with filename, scenario and repetitions per execution
-        name_components = filename.split(',')
-
-        df_results.insert(0, 'name', filename)
-
-        for i, component in enumerate(name_components):
-            component = component.strip('-')
-            component = component.strip('.csv')
-
-            if i == 0:
-                df_results.insert(i + 1, 'scenario', component)
-            if i >= 1:
-                if i + 1 == len(name_components):
-                    df_results.insert(i + 1, 'repetition', component)
-                else:
-                    df_results.insert(i + 1, '{}'.format(iteration_parameters_list[i-1]), np.int(component))
-
-        # Add column with distance from accidented node QSN
-        tx_df = df_results[df_results.TR == 'tx']
-        tx_df = tx_df[tx_df.NodeID == 0]
-        x = tx_df[tx_df.MsgTime <=1000].x
-        x = x.astype('float64')
-        y = tx_df[tx_df.MsgTime <= 1000].y
-        y = y.astype('float64')
-        # max distance of rx message
-        df_results = df_results[df_results.TR == 'rx']
-        df_results['Distance'] = ((x - df_results.x)**2 + (y - df_results.y)**2)**(1/2)
-
-        if not df_results.empty:
-            maximumdist = max(df_results['Distance'])
-            #rx_df['MaxDistance'] = maximumdist
-        else:
-            maximumdist = 0
-        df_results.insert(1, 'MaxDistance', maximumdist)
-
-        # number of nodes
-        df_results.drop_duplicates(subset='NodeID', keep="last", inplace=True)
-        num_nodes = int(df_results.NodeID.count())
-        #rx_df['NumNodes'] = num_nodes
-        df_results.insert(2, 'NumberNodes', num_nodes)
-        return df_results
+    return default_df
 
 
 def parse_if_number(s):
