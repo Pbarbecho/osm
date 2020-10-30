@@ -158,7 +158,6 @@ def add_user_custom_columns(default_df):
     acc_x, acc_y = accident_node.at[0, 'x'], accident_node.at[0, 'y']
     # Euclidean distance
     default_df['DistanceToAccident'] = ((acc_x - default_df.x) ** 2 + (acc_y - default_df.y) ** 2) ** (1 / 2)
-
     return default_df
 
 
