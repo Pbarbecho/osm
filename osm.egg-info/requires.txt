@@ -1,0 +1,12 @@
+click
+matplotlib
+numpy
+pandas
+pathlib
+uuid
+scipy
+pivottablejs
+seaborn
+joblib
+ipython
+dask[dataframe]

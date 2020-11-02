@@ -1,4 +1,4 @@
-from .custom_analyzer import warning_depth, warned_vehicles, packet_delay
+from .custom_analyzer import custom_filter_plots
 from .campaign import run
 from .default_summarizer import merge_files
 from .cli import cli

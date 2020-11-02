@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+setup.py
+osm/__init__.py
+osm/campaign.py
+osm/cli.py
+osm/custom_analyzer.py
+osm/default_summarizer.py
+osm.egg-info/PKG-INFO
+osm.egg-info/SOURCES.txt
+osm.egg-info/dependency_links.txt
+osm.egg-info/entry_points.txt
+osm.egg-info/requires.txt
+osm.egg-info/top_level.txt

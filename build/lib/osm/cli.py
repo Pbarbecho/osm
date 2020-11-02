@@ -153,39 +153,28 @@ def summarizer(config, max_processes, input_dir, output_dir, output_filename, ad
         click.echo('No such file or directory or is empty: {} or {}'.format(input_dir, additional_files_path))
 
 
-
 ############
 # Analyzer #
 ############
 @cli.command()
-@click.option('-i', '--input-csv-file',
-              type=click.Path(exists=True, resolve_path=True), 
-              help=('Input .csv file with merged results. Default(~/osm/summary/' + str(hex(uuid.getnode())) + ")") )
+@click.option('-i', '--input-cvs-file',
+              type=click.Path(exists=True, resolve_path=True),
+              help='Input .csv file with merge results')
 @click.option('-o', '--output-dir',
-              type=click.Path(exists=True, resolve_path=True), 
-              help=('Input .csv file with merged results. Default(~/osm/analyzer/' + str(hex(uuid.getnode())) + ")") )
-@click.option('-wd', '--warning-depth', default=False, is_flag=True,
-              help='Plot warning message depth (maximum distance reached from the accident)')
-@click.option('-wv', '--warned-vehicles', default=False, is_flag=True,
-              help='Plot percentage of warned vehicles when accident occurs')
-@click.option('-pd', '--packet-delay', default=False, is_flag=True,
-              help='Plot average packet delay for each number of hops')
+              type=click.Path(exists=True, resolve_path=True),
+              help='Path to directory where custom analyzed factors are saved.')
+@click.option('-plt', '--interactive-pivot-table', is_flag=True,
+              help='GUI in firefox to drag columns and plot resutls dataframe.')
 @pass_config
-def analyzer(config, input_csv_file, output_dir, warning_depth, warned_vehicles, packet_delay):
+def analyzer(config, input_cvs_file, output_dir, interactive_pivot_table):
     """
     Customized filtering and plotting.
-    
     """
 
     if output_dir is None: output_dir = os.path.join(config.parents_dir, 'analyzer', config.mac)
-    if input_csv_file is None: input_csv_file = os.path.join(config.parents_dir, 'summary', config.mac, 'results.csv')
-    if os.path.exists(input_csv_file):
+    if input_cvs_file is None: input_cvs_file = os.path.join(config.parents_dir, 'summary', config.mac, 'results.csv')
+    if os.path.exists(input_cvs_file):
         # Analyzer
-        if warning_depth:
-          osm.warning_depth(input_csv_file, output_dir)
-        if warned_vehicles:
-          osm.warned_vehicles(input_csv_file, output_dir)
-        if packet_delay:
-          osm.packet_delay(input_csv_file, output_dir)
+        osm.custom_filter_plots(input_cvs_file, output_dir, interactive_pivot_table)
     else:
-        click.echo('No such file or directory or is empty: {}'.format(input_csv_file)) 
+        click.echo('No such file or directory or is empty: {}'.format(input_cvs_file))
