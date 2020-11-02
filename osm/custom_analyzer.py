@@ -319,13 +319,22 @@ def packet_delay(tmp, output_directory):
     filename = "packet_delay.pdf"
     dataframe = pd.read_csv(tmp)
 
-    num_vehicles = [50, 100, 150, 200]
-    dataframe_keys = ["dataframe50", "dataframe100", "dataframe150", "dataframe200"]
+    dataframe_vehicles = dataframe.sort_values(by='NumberofVehicles')
+    dataframe_vehicles = dataframe_vehicles.groupby(['NumberofVehicles']).mean()
+
+    num_vehicles = []
+    dataframe_keys = []
+
+    #Create dataframe for each number of vehicles in the simulation
+    for i in range(len(dataframe_vehicles)):
+        num = dataframe_vehicles.index.get_level_values(0).values[i]
+        num_vehicles.append(num)
+        dataframe_keys.append("dataframe" + str(num))
     dataframes = dict.fromkeys(dataframe_keys)
 
     fig, ax = plt.subplots()
 
-    for i in range(3):
+    for i in range(len(dataframe_vehicles)):
         #Create a dataframe for each number of vehicles and work with received packets
         dataframes[dataframe_keys[i]] = dataframe.loc[(dataframe.NumberofVehicles == num_vehicles[i]) & (dataframe.TR == 'rx')].sort_values(by=['Hops'])
         #Calculate mean delay for each number of hops
@@ -359,13 +368,25 @@ def warned_vehicles(tmp, output_directory):
     count = []
 
     dataframe = pd.read_csv(tmp)
+
+
+    #Get elements to iterate
+    dataframe_vehicles = dataframe.sort_values(by='NumberofVehicles')
+    dataframe_vehicles = dataframe_vehicles.groupby(['NumberofVehicles']).mean()
+    num_vehicles = []
+
+    #Get array with simulated number of vehicles
+    for i in range(len(dataframe_vehicles)):
+        num = dataframe_vehicles.index.get_level_values(0).values[i]
+        num_vehicles.append(num)
+
     #Work only with received packets
     dataframe = dataframe.loc[dataframe.TR == 'rx']
     #Group to avoid vehicle repetition
     dataframe = dataframe.groupby(['NumberofVehicles', 'repetition', 'NodeID']).mean()
 
-    for i in [50, 100, 150, 200]:
-        for j in [0, 1, 2]:
+    for i in num_vehicles:
+        for j in range(dataframe.index.get_level_values(1).nunique()):
             #Calculate percentage of vehicles that receive warning message
             count.append((len(dataframe.loc[(dataframe.index.get_level_values(0) == i) & (dataframe.index.get_level_values(1) == j)])*100)/i)
 
@@ -400,6 +421,7 @@ def warning_depth(tmp, output_directory):
     filename = "warning_depth.pdf"
 
     dataframe = pd.read_csv(tmp)
+
     #Work with rx packets and group by number of vechicles and repetition calculating maximum distance
     dataframe = dataframe.loc[dataframe.TR == 'rx']
     dataframe = dataframe.groupby(['NumberofVehicles', 'repetition']).max()
