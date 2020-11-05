@@ -1,0 +1,21 @@
+** Event #0   t=0   Elapsed: 1.1e-05s (0m 00s)  0% completed  (77% total)   ev/sec=0
+** Event #1006592   t=17.454649253715   Elapsed: 50.3302s (0m 50s)  1% completed  (77% total)   ev/sec=19999.8
+** Event #4207104   t=47.424956380693   Elapsed: 100.331s (1m 40s)  4% completed  (78% total)   ev/sec=64008.7
+** Event #9800448   t=88.62729077297   Elapsed: 150.332s (2m 30s)  8% completed  (78% total)   ev/sec=111865
+** Event #15604992   t=126.434930854073   Elapsed: 200.334s (3m 20s)  12% completed  (79% total)   ev/sec=116086
+** Event #22016512   t=168.346178888385   Elapsed: 250.335s (4m 10s)  16% completed  (79% total)   ev/sec=128228
+** Event #28620032   t=211.737488792644   Elapsed: 300.336s (5m 00s)  21% completed  (80% total)   ev/sec=132069
+** Event #35208192   t=258.948101034431   Elapsed: 350.336s (5m 50s)  25% completed  (80% total)   ev/sec=131762
+** Event #42046464   t=307.325938659985   Elapsed: 400.337s (6m 40s)  30% completed  (81% total)   ev/sec=136764
+** Event #49516288   t=361.918993020545   Elapsed: 450.337s (7m 30s)  36% completed  (81% total)   ev/sec=149394
+** Event #60480768   t=440.53210277343   Elapsed: 500.338s (8m 20s)  44% completed  (82% total)   ev/sec=219287
+** Event #71523072   t=523.62315537435   Elapsed: 550.338s (9m 10s)  52% completed  (83% total)   ev/sec=220845
+** Event #82712576   t=610.121324523816   Elapsed: 600.339s (10m 00s)  61% completed  (84% total)   ev/sec=223785
+** Event #93786624   t=699.724584403683   Elapsed: 650.339s (10m 50s)  69% completed  (85% total)   ev/sec=221481
+** Event #105077504   t=792.42101564167   Elapsed: 700.34s (11m 40s)  79% completed  (86% total)   ev/sec=225814
+** Event #116362240   t=883.421081824827   Elapsed: 750.341s (12m 30s)  88% completed  (87% total)   ev/sec=225690
+** Event #128305152   t=975.426832538769   Elapsed: 800.342s (13m 20s)  97% completed  (88% total)   ev/sec=238857
+** Event #131498463   t=1000   Elapsed: 813.434s (13m 33s)  100% completed  (88% total)   ev/sec=243911
+
+<!> Simulation time limit reached -- at t=1000s, event #131498463
+undisposed object: (veins::TraCIDemo11pMessage) RSUExampleScenario.node[0].appl. -- check module destructor

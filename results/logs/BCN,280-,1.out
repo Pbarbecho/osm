@@ -1,0 +1,10 @@
+** Event #0   t=0   Elapsed: 9e-06s (0m 00s)  0% completed  (44% total)   ev/sec=0
+** Event #4737536   t=89.804443584036   Elapsed: 50.0003s (0m 50s)  8% completed  (45% total)   ev/sec=94750.2
+** Event #15579136   t=247.725251179057   Elapsed: 100.001s (1m 40s)  24% completed  (47% total)   ev/sec=216831
+** Event #26631680   t=438.614713801892   Elapsed: 150.001s (2m 30s)  43% completed  (49% total)   ev/sec=221048
+** Event #36708608   t=651.237164650595   Elapsed: 200.002s (3m 20s)  65% completed  (51% total)   ev/sec=201536
+** Event #46136576   t=856.038194057699   Elapsed: 250.003s (4m 10s)  85% completed  (53% total)   ev/sec=188554
+** Event #53157817   t=1000   Elapsed: 286.115s (4m 46s)  100% completed  (55% total)   ev/sec=194434
+
+<!> Simulation time limit reached -- at t=1000s, event #53157817
+undisposed object: (veins::TraCIDemo11pMessage) RSUExampleScenario.node[0].appl. -- check module destructor

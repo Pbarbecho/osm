@@ -165,13 +165,15 @@ def summarizer(config, max_processes, input_dir, output_dir, output_filename, ad
               type=click.Path(exists=True, resolve_path=True), 
               help=('Input .csv file with merged results. Default(~/osm/analyzer/' + str(hex(uuid.getnode())) + ")") )
 @click.option('-wd', '--warning-depth', default=False, is_flag=True,
-              help='Plot warning message depth (maximum distance reached from the accident)')
+              help='Plot warning message depth (maximum euclidian distance reached from the accident)')
+@click.option('-wm', '--warning-depth-map', default=False, is_flag=True,
+              help='Plot warning message depth (maximum distance on the map reached from the accident)')
 @click.option('-wv', '--warned-vehicles', default=False, is_flag=True,
               help='Plot percentage of warned vehicles when accident occurs')
 @click.option('-pd', '--packet-delay', default=False, is_flag=True,
               help='Plot average packet delay for each number of hops')
 @pass_config
-def analyzer(config, input_csv_file, output_dir, warning_depth, warned_vehicles, packet_delay):
+def analyzer(config, input_csv_file, output_dir, warning_depth, warning_depth_map, warned_vehicles, packet_delay):
     """
     Customized filtering and plotting.
     
@@ -183,6 +185,8 @@ def analyzer(config, input_csv_file, output_dir, warning_depth, warned_vehicles,
         # Analyzer
         if warning_depth:
           osm.warning_depth(input_csv_file, output_dir)
+        if warning_depth_map:
+          osm.warning_depth_map(input_csv_file, output_dir)
         if warned_vehicles:
           osm.warned_vehicles(input_csv_file, output_dir)
         if packet_delay:

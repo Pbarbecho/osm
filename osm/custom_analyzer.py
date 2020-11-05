@@ -340,7 +340,7 @@ def packet_delay(tmp, output_directory):
         #Calculate mean delay for each number of hops
         dataframes[dataframe_keys[i]] = dataframes[dataframe_keys[i]].groupby(['Hops']).mean()
         #Plot dataframe
-        plt.plot(dataframes[dataframe_keys[i]].index.get_level_values(0), dataframes[dataframe_keys[i]].Delay, "-o", label=("Num Vehicles: " + str(num_vehicles[i]))) 
+        plt.plot(dataframes[dataframe_keys[i]].index.get_level_values(0), dataframes[dataframe_keys[i]].Delay, "-o", label=("Vehicles density [veh/km2]: " + str(round(num_vehicles[i]/3.5,1)))) 
     #Format plot
     plt.grid()
     plt.legend(loc="upper left")
@@ -396,14 +396,14 @@ def warned_vehicles(tmp, output_directory):
     dataframe['Count'] = count
 
     #Prepare dataframe to plot
-    data_plot = {"NumberofVehicles": dataframe.index.get_level_values(0), "Count": count}
-    dataframe_plot = pd.DataFrame(data_plot, columns = ["NumberofVehicles", "Count"])
+    data_plot = {"DensityofVehicles": np.round(dataframe.index.get_level_values(0)/3.5, 1), "Count": count}
+    dataframe_plot = pd.DataFrame(data_plot, columns = ["DensityofVehicles", "Count"])
 
     #Plot dataframe
     fig, ax = plt.subplots()
-    fig = sns.pointplot(x='NumberofVehicles', y='Count', data=dataframe_plot, join=False)
+    fig = sns.pointplot(x='DensityofVehicles', y='Count', data=dataframe_plot, join=False)
     #Format plot
-    fig.set(xlabel='Number of vehicles', ylabel='%  warned vehicles')
+    fig.set(xlabel='Density of vehicles [veh/km2]', ylabel='%  warned vehicles')
     plt.savefig(os.path.join(output_directory, filename))    
 
 def warning_depth(tmp, output_directory):
@@ -427,12 +427,43 @@ def warning_depth(tmp, output_directory):
     dataframe = dataframe.groupby(['NumberofVehicles', 'repetition']).max()
 
     #Prepare dataframe to plot
-    data_plot = {"NumberofVehicles": dataframe.index.get_level_values(0), "WarningDepth": dataframe['DistanceToAccident']}
-    dataframe_plot = pd.DataFrame(data_plot, columns = ["NumberofVehicles", "WarningDepth"])
+    data_plot = {"DensityofVehicles": np.round(dataframe.index.get_level_values(0)/3.5, 1), "WarningDepth": dataframe['DistanceToAccident']}
+    dataframe_plot = pd.DataFrame(data_plot, columns = ["DensityofVehicles", "WarningDepth"])
 
     #Plot dataframe
     fig, ax = plt.subplots()
-    fig = sns.pointplot(x='NumberofVehicles', y='WarningDepth', data=dataframe_plot, join=False)
+    fig = sns.pointplot(x='DensityofVehicles', y='WarningDepth', data=dataframe_plot, join=False)
     #Format plot
-    fig.set(xlabel='Number of vehicles', ylabel='Warning Depth [m]')
+    fig.set(xlabel='Density of vehicles[veh/km2]', ylabel='Warning Depth (euclidian distance) [m]')
+    plt.savefig(os.path.join(output_directory, filename))
+
+def warning_depth_map(tmp, output_directory):
+    """
+
+    Depth of the warning message (maximum distance on the map it reaches from the accident) when accident occurs
+
+    Input:
+        csv file with results summary
+    Output:
+        custom plot
+
+    """
+
+    filename = "warning_depth_map.pdf"
+
+    dataframe = pd.read_csv(tmp)
+
+    #Work with rx packets and group by number of vechicles and repetition calculating maximum distance
+    dataframe = dataframe.loc[dataframe.TR == 'rx']
+    dataframe = dataframe.groupby(['NumberofVehicles', 'repetition']).max()
+
+    #Prepare dataframe to plot
+    data_plot = {"DensityofVehicles": np.round(dataframe.index.get_level_values(0)/3.5, 1), "WarningDepthMap": dataframe['SumoDistance']}
+    dataframe_plot = pd.DataFrame(data_plot, columns = ["DensityofVehicles", "WarningDepthMap"])
+
+    #Plot dataframe
+    fig, ax = plt.subplots()
+    fig = sns.pointplot(x='DensityofVehicles', y='WarningDepthMap', data=dataframe_plot, join=False)
+    #Format plot
+    fig.set(xlabel='Density of vehicles[veh/km2]', ylabel='Warning Depth (map distance) [m]')
     plt.savefig(os.path.join(output_directory, filename))
