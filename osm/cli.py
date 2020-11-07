@@ -165,7 +165,7 @@ def summarizer(config, max_processes, input_dir, output_dir, output_filename, ad
               type=click.Path(exists=True, resolve_path=True), 
               help=('Input .csv file with merged results. Default(~/osm/analyzer/' + str(hex(uuid.getnode())) + ")") )
 @click.option('-wd', '--warning-depth', default=False, is_flag=True,
-              help='Plot warning message depth (maximum euclidian distance reached from the accident)')
+              help='Plot warning message depth (maximum euclidian/map distances reached from the accident)')
 @click.option('-wm', '--warning-depth-map', default=False, is_flag=True,
               help='Plot warning message depth (maximum distance on the map reached from the accident)')
 @click.option('-wv', '--warned-vehicles', default=False, is_flag=True,

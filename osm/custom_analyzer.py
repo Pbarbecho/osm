@@ -1,4 +1,6 @@
 import os
+
+import matplotlib
 import pandas as pd
 import matplotlib.pyplot as plt
 from osm.campaign import new_folder
@@ -7,6 +9,12 @@ import pivottablejs as pj
 import seaborn as sns
 import numpy as np
 import matplotlib.ticker as mtick
+# set general plot style
+sns.set(font_scale=1,
+        style="ticks",
+        rc={"lines.linewidth": 0.9},
+        palette=sns.palplot(sns.color_palette('Paired')),
+        color_codes=True)
 
 
 def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table):
@@ -343,14 +351,16 @@ def packet_delay(tmp, output_directory):
         #Calculate mean delay for each number of hops
         dataframes[dataframe_keys[i]] = dataframes[dataframe_keys[i]].groupby(['Hops']).mean()
         #Plot dataframe
-        plt.plot(dataframes[dataframe_keys[i]].index.get_level_values(0), dataframes[dataframe_keys[i]].Delay, "-o", label=("Vehicles density [veh/km2]: " + str(round(num_vehicles[i]/3.5,1)))) 
+        markers = ['o', 'x', '^', 'v', '.', '<', '>']
+        plt.plot(dataframes[dataframe_keys[i]].index.get_level_values(0), dataframes[dataframe_keys[i]].Delay, marker=markers[i],
+                 label=(r"$\delta$ = " + str(round(num_vehicles[i]/3.5, 1))))
     #Format plot
     plt.grid()
     plt.legend(loc="upper left")
     plt.xlabel("Number of hops", fontsize=12)
     plt.ylabel("Average packet delay (s)", fontsize=12)
     ax.xaxis.set_major_formatter(mtick.FormatStrFormatter('%.0f'))
-    ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.2f'))
+    ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.0f'))
     #Save figure
     plt.savefig(os.path.join(output_directory, filename))
 
@@ -405,9 +415,13 @@ def warned_vehicles(tmp, output_directory):
 
     #Plot dataframe
     fig, ax = plt.subplots()
-    fig = sns.pointplot(x='DensityofVehicles', y='Count', data=dataframe_plot, join=False)
+    fig = sns.pointplot(x='DensityofVehicles',
+                        y='Count',
+                        data=dataframe_plot,
+                        capsize=0.1,
+                        join=True)
     #Format plot
-    fig.set(xlabel='Density of vehicles [veh/km2]', ylabel='%  warned vehicles')
+    fig.set(xlabel='Density of vehicles [veh/km$^{2}$]', ylabel='% of warned vehicles')
     plt.savefig(os.path.join(output_directory, filename))    
 
 
@@ -433,14 +447,23 @@ def warning_depth(tmp, output_directory):
     dataframe = dataframe.groupby(['NumberofVehicles', 'repetition']).max()
 
     #Prepare dataframe to plot
-    data_plot = {"DensityofVehicles": np.round(dataframe.index.get_level_values(0)/3.5, 1), "WarningDepth": dataframe['DistanceToAccident']}
-    dataframe_plot = pd.DataFrame(data_plot, columns = ["DensityofVehicles", "WarningDepth"])
+    data_plot = {"DensityofVehicles": np.round(dataframe.index.get_level_values(0)/3.5, 1),
+                 "Euclidean": dataframe['DistanceToAccident']/1000,
+                 "Map": dataframe['SumoDistance']/1000}
+    df = pd.DataFrame(data_plot, columns=["DensityofVehicles", "Euclidean", 'Map'])
 
-    #Plot dataframe
-    fig, ax = plt.subplots()
-    fig = sns.pointplot(x='DensityofVehicles', y='WarningDepth', data=dataframe_plot, join=False)
-    #Format plot
-    fig.set(xlabel='Density of vehicles[veh/km2]', ylabel='Warning Depth (euclidian distance) [m]')
+    # Plot distances
+    df = df.melt('DensityofVehicles', var_name='cols', value_name='Distance')
+    g = sns.catplot(x="DensityofVehicles",
+                    y="Distance",
+                    hue='cols',
+                    data=df,
+                    capsize=0.1,
+                    legend_out=False,
+                    kind='point')
+    plt.legend(title='', loc='best')
+    sns.despine(left=False, top=False, right=False)
+    g.set_axis_labels('Density of vehicles [veh/km$^{2}$]', 'Warning distance [Km]')
     plt.savefig(os.path.join(output_directory, filename))
 
 
@@ -473,5 +496,5 @@ def warning_depth_map(tmp, output_directory):
     fig, ax = plt.subplots()
     fig = sns.pointplot(x='DensityofVehicles', y='WarningDepthMap', data=dataframe_plot, join=False)
     #Format plot
-    fig.set(xlabel='Density of vehicles[veh/km2]', ylabel='Warning Depth (map distance) [m]')
+    fig.set(xlabel='Density of vehicles[veh/km$^{2}$]', ylabel='Warning Depth (map distance) [m]')
     plt.savefig(os.path.join(output_directory, filename))
