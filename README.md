@@ -93,4 +93,6 @@ pip3 uninstall osm
 
 Pablo Barbecho
 
+Alicia Bel
+
 [rtd]: https://osm.readthedocs.io/en/latest/
