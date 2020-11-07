@@ -9,10 +9,6 @@ import numpy as np
 import matplotlib.ticker as mtick
 
 
-number_of_nodes = 250
-evaluate = 'scenario'
-
-
 def custom_filter_plots(input_csv_file, output_directory, custom_pivot_table):
     """
 
@@ -304,6 +300,12 @@ def node_speed(df, output_directory):
     fig.set_axis_labels('Accident duration (s)', 'Speed (m/s)')
     plt.savefig(os.path.join(output_directory, filename), bbox_inches="tight")
 
+
+def plots_folder(new_directory):
+    if not os.path.exists(new_directory):
+        os.makedirs(new_directory)
+
+
 def packet_delay(tmp, output_directory):
     """
 
@@ -315,7 +317,8 @@ def packet_delay(tmp, output_directory):
         custom plot
 
     """
-
+    # add analyzer folder for plots
+    plots_folder(output_directory)
     filename = "packet_delay.pdf"
     dataframe = pd.read_csv(tmp)
 
@@ -363,7 +366,8 @@ def warned_vehicles(tmp, output_directory):
         custom plot
 
     """
-
+    # add analyzer folder for plots
+    plots_folder(output_directory)
     filename = "warned_vehicles.pdf"
     count = []
 
@@ -406,6 +410,7 @@ def warned_vehicles(tmp, output_directory):
     fig.set(xlabel='Density of vehicles [veh/km2]', ylabel='%  warned vehicles')
     plt.savefig(os.path.join(output_directory, filename))    
 
+
 def warning_depth(tmp, output_directory):
     """
 
@@ -417,7 +422,8 @@ def warning_depth(tmp, output_directory):
         custom plot
 
     """
-
+    # add analyzer folder for plots
+    plots_folder(output_directory)
     filename = "warning_depth.pdf"
 
     dataframe = pd.read_csv(tmp)
@@ -437,6 +443,7 @@ def warning_depth(tmp, output_directory):
     fig.set(xlabel='Density of vehicles[veh/km2]', ylabel='Warning Depth (euclidian distance) [m]')
     plt.savefig(os.path.join(output_directory, filename))
 
+
 def warning_depth_map(tmp, output_directory):
     """
 
@@ -448,7 +455,8 @@ def warning_depth_map(tmp, output_directory):
         custom plot
 
     """
-
+    # add analyzer folder for plots
+    plots_folder(output_directory)
     filename = "warning_depth_map.pdf"
 
     dataframe = pd.read_csv(tmp)
