@@ -1,5 +1,4 @@
 README.md
-pyproject.toml
 setup.py
 osm/__init__.py
 osm/campaign.py
